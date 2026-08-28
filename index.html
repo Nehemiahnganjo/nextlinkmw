@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="NextLink MW — Custom software, IT infrastructure, and network solutions for businesses in Malawi. POS, SACCO, hotel, school, Android apps and more."/>
-  <title>NextLink MW | IT Solutions Malawi</title>
+  <meta name="description" id="meta-desc" content=""/>
+  <title id="page-title">NextLink MW</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
@@ -286,7 +286,7 @@
 
 <!-- NAV -->
 <nav>
-  <a class="logo" href="#"><span>Next</span>Link MW</a>
+  <a class="logo" href="#" id="nav-logo"></a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
     <li><a href="#why">Why Us</a></li>
@@ -295,19 +295,19 @@
   </ul>
   <div class="nav-right">
     <button id="theme-btn" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
-    <a class="nav-cta" href="#contact">Get a Quote</a>
+    <a class="nav-cta" id="nav-cta" href="#contact"></a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge"><i class="fas fa-map-marker-alt"></i> Rumphi, Malawi &nbsp;·&nbsp; Local &amp; Remote</div>
-    <h1>Your IT Problems,<br/><em>Permanently Solved</em></h1>
-    <p>Custom software. Network infrastructure. Financial systems. IoT. If your business has an IT problem that spreadsheets and off-the-shelf software can't fix — that's exactly what NextLink MW is for.</p>
+    <div class="hero-badge" id="hero-badge"></div>
+    <h1 id="hero-heading"></h1>
+    <p id="hero-sub"></p>
     <div class="hero-btns">
-      <a class="btn-primary" href="#services">See What We Build</a>
-      <a class="btn-ghost"   href="#contact">Talk to Us</a>
+      <a class="btn-primary" id="hero-btn-primary" href="#services"></a>
+      <a class="btn-ghost"   id="hero-btn-ghost"   href="#contact"></a>
     </div>
   </div>
 </section>
@@ -315,113 +315,31 @@
 <!-- STATS -->
 <div class="stats-bar">
   <div class="container">
-    <div class="stats-grid">
-      <div class="stat-tile"><div class="stat-num">5+</div><div class="stat-lbl">Years in the Field</div></div>
-      <div class="stat-tile"><div class="stat-num">10+</div><div class="stat-lbl">Systems Deployed</div></div>
-      <div class="stat-tile"><div class="stat-num">7+</div><div class="stat-lbl">Industries Served</div></div>
-      <div class="stat-tile"><div class="stat-num">24/7</div><div class="stat-lbl">Support Available</div></div>
-    </div>
+    <div class="stats-grid" id="stats-grid"></div>
   </div>
 </div>
 
 <!-- SERVICES -->
 <section id="services">
   <div class="container">
-    <div class="label">What We Build</div>
-    <div class="section-title">Software That Fits<br/>Your Business — Not the Other Way Round</div>
-    <p class="section-sub">Every system is built from scratch for your specific workflows. No bloated templates, no licensing fees, no features you'll never use.</p>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-cash-register"></i></div>
-        <h3>POS &amp; Retail Systems</h3>
-        <p>Sales, stock, receipts, daily reports. Works offline. Scales from a single till to a multi-branch operation.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-hotel"></i></div>
-        <h3>Lodge &amp; Hotel PMS</h3>
-        <p>Room bookings, check-in/out, invoicing, housekeeping status. Everything a property needs to stop losing money to manual processes.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-graduation-cap"></i></div>
-        <h3>School &amp; College Systems</h3>
-        <p>Enrollment, timetables, grades, fee collection, and parent communication — all in one place, maintained by your own staff.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-landmark"></i></div>
-        <h3>SACCO &amp; MFI Systems</h3>
-        <p>Member accounts, loan management, savings ledgers, interest calculations, and USSD mobile banking — RBM-aware and audit-ready.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-seedling"></i></div>
-        <h3>Farm &amp; Agri Management</h3>
-        <p>Track livestock, crop cycles, inputs, harvests, and sales. Built for operations that run in the field, not just on a desktop.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-mobile-screen"></i></div>
-        <h3>Android Mobile Apps</h3>
-        <p>Native Kotlin apps that connect to your backend and work the way your team actually works — fast, offline-capable, no browser required.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-globe"></i></div>
-        <h3>Business Websites &amp; CMS</h3>
-        <p>Professional websites your staff can update without calling a developer. SEO-ready, mobile-friendly, and actually maintained.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-microchip"></i></div>
-        <h3>IoT &amp; Automation</h3>
-        <p>ESP32 and Raspberry Pi solutions for monitoring, control, and automation — sensor dashboards, MQTT pipelines, relay systems.</p>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fas fa-network-wired"></i></div>
-        <h3>Network &amp; Infrastructure</h3>
-        <p>Cisco switches and routers, Windows Server, Active Directory, VPN, CCTV, VMware virtualisation, structured cabling — designed to stay up.</p>
-      </div>
-    </div>
+    <div class="label"    id="svc-label"></div>
+    <div class="section-title" id="svc-title"></div>
+    <p class="section-sub"    id="svc-sub"></p>
+    <div class="services-grid" id="services-grid"></div>
   </div>
 </section>
 
 <!-- WHY US -->
 <section id="why">
   <div class="container">
-    <div class="label">Why NextLink MW</div>
-    <div class="section-title">Not a Tech Company<br/>That Learned About Malawi.<br/>The Other Way Around.</div>
+    <div class="label"         id="why-label"></div>
+    <div class="section-title" id="why-title"></div>
     <div class="why-wrap">
-      <div class="why-list">
-        <div class="why-item">
-          <div class="why-dot"><i class="fas fa-bolt"></i></div>
-          <div>
-            <h4>5+ Years Managing Real Infrastructure</h4>
-            <p>Full IT operations for financial institutions in Malawi — not just consulting, actually running the systems day to day.</p>
-          </div>
-        </div>
-        <div class="why-item">
-          <div class="why-dot"><i class="fas fa-layer-group"></i></div>
-          <div>
-            <h4>One Person. Full Stack. No Handoffs.</h4>
-            <p>From network cabling to the mobile app your staff uses. One point of contact, one person accountable for the whole thing.</p>
-          </div>
-        </div>
-        <div class="why-item">
-          <div class="why-dot"><i class="fas fa-shield-halved"></i></div>
-          <div>
-            <h4>RBM-Compliant &amp; Audit-Ready</h4>
-            <p>MUSCCO and MFI-Hub experience. Financial software built to meet Reserve Bank of Malawi data security requirements.</p>
-          </div>
-        </div>
-        <div class="why-item">
-          <div class="why-dot"><i class="fas fa-map"></i></div>
-          <div>
-            <h4>Works in Rural Malawi. Not Just on Paper.</h4>
-            <p>Offline-first design, low-bandwidth optimisation, and support that doesn't require you to be in Lilongwe to get a response.</p>
-          </div>
-        </div>
-      </div>
+      <div class="why-list" id="why-list"></div>
       <div class="why-panel">
-        <div class="why-panel-dial">
-          <div class="inner"><i class="fas fa-laptop-code"></i></div>
-        </div>
-        <h3>Built Here. Works Here.</h3>
-        <p>Most software sold in Malawi was built for somewhere else and retrofitted. NextLink MW builds for Malawian workflows, Malawian connectivity, and Malawian scale — from day one.</p>
+        <div class="why-panel-dial"><div class="inner"><i class="fas fa-laptop-code"></i></div></div>
+        <h3 id="why-panel-h"></h3>
+        <p  id="why-panel-p"></p>
       </div>
     </div>
   </div>
@@ -430,111 +348,165 @@
 <!-- PROJECTS -->
 <section id="projects">
   <div class="container">
-    <div class="label">Proof of Work</div>
-    <div class="section-title">Things We've Actually Shipped</div>
-    <p class="section-sub">A selection of projects built, deployed, and being used by real people right now.</p>
-    <div class="projects-grid">
-      <div class="project-card">
-        <h3>🌐 Unique SACCO Platform</h3>
-        <p>Live SACCO website with member portal and floating CMS panel. Non-technical staff manage content without touching code. Real accounts. Real transactions.</p>
-        <div class="tags"><span class="tag">PHP</span><span class="tag">JavaScript</span><span class="tag">CMS</span><span class="tag">Live</span></div>
-      </div>
-      <div class="project-card">
-        <h3>🏦 Karonga Village Bank</h3>
-        <p>Full village banking system for Bank Mmuzi — member registration, savings accounts, loan tracking, and repayment schedules. Runs on a single machine, no internet required.</p>
-        <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Offline-first</span></div>
-      </div>
-      <div class="project-card">
-        <h3>🏠 Next Smart Home</h3>
-        <p>Home automation stack built on ESP32 — MQTT over TLS, real-time WebSocket dashboard, Android control app. Relay switching, PWM, and sensor monitoring from your phone.</p>
-        <div class="tags"><span class="tag">ESP32</span><span class="tag">Laravel</span><span class="tag">Android</span><span class="tag">MQTT</span></div>
-      </div>
-      <div class="project-card">
-        <h3>🐧 Nganjo OS</h3>
-        <p>Custom Arch Linux distribution — GNOME on Wayland, pre-configured for a developer workstation. Ships as a bootable ISO. Used daily as a primary OS.</p>
-        <div class="tags"><span class="tag">Bash</span><span class="tag">Archiso</span><span class="tag">Linux</span></div>
-      </div>
-      <div class="project-card">
-        <h3>🤖 Atarah Assistant</h3>
-        <p>AI assistant built from scratch — voice input, persistent memory, reasoning engine, and desktop system integration. Not a wrapper around someone else's API.</p>
-        <div class="tags"><span class="tag">Python</span><span class="tag">AI</span><span class="tag">Voice</span><span class="tag">Local</span></div>
-      </div>
-      <div class="project-card">
-        <h3>⚽ Bet Neural</h3>
-        <p>Football match outcome predictor — Poisson regression + ensemble ML trained on six years of match data across seven European leagues. Consistently outperforms pundit consensus.</p>
-        <div class="tags"><span class="tag">Python</span><span class="tag">ML</span><span class="tag">Poisson</span><span class="tag">7 Leagues</span></div>
-      </div>
-    </div>
+    <div class="label"         id="proj-label"></div>
+    <div class="section-title" id="proj-title"></div>
+    <p class="section-sub"    id="proj-sub"></p>
+    <div class="projects-grid" id="projects-grid"></div>
   </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact">
   <div class="container">
-    <div class="label">Get In Touch</div>
-    <div class="section-title">Got a Project in Mind?</div>
-    <p class="section-sub" style="margin:0 auto 0;">Tell us what you're trying to build or fix. If it's doable, we'll tell you how. If it's not, we'll tell you that too.</p>
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
-        <p>Email</p>
-        <a href="mailto:nehemiahnganjo@outlook.com">nehemiahnganjo@outlook.com</a>
-      </div>
-      <div class="contact-card">
-        <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
-        <p>WhatsApp</p>
-        <a href="https://wa.me/265882730381" target="_blank">+265 882 730 381</a>
-      </div>
-      <div class="contact-card">
-        <div class="contact-icon"><i class="fab fa-linkedin"></i></div>
-        <p>LinkedIn</p>
-        <a href="https://linkedin.com/in/nehemiah-ng-anjo-773ba01b5" target="_blank">Nehemiah Ng'anjo</a>
-      </div>
-      <div class="contact-card">
-        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
-        <p>Based In</p>
-        <a href="#">Rumphi, Malawi 🇲🇼</a>
-      </div>
-    </div>
-    <a class="btn-primary" href="mailto:nehemiahnganjo@outlook.com">Start a Conversation</a>
+    <div class="label"         id="ct-label"></div>
+    <div class="section-title" id="ct-title"></div>
+    <p class="section-sub" style="margin:0 auto;" id="ct-sub"></p>
+    <div class="contact-grid"  id="contact-grid"></div>
+    <a class="btn-primary" id="ct-btn" href="mailto:nehemiahnganjo@outlook.com"></a>
   </div>
 </section>
 
-<footer>
-  <p>© 2026 <span>NextLink MW</span> &nbsp;·&nbsp; Custom IT Solutions, Malawi &nbsp;·&nbsp; Built by Nehemiah Ng'anjo</p>
-</footer>
+<footer><p id="footer-text"></p></footer>
 
 <script>
-  // ── Theme toggle ──────────────────────────────────────────
-  const btn  = document.getElementById('theme-btn');
-  const root = document.documentElement;
-  const icon = btn.querySelector('i');
+// ── Theme toggle ────────────────────────────────────────────
+const btn  = document.getElementById('theme-btn');
+const root = document.documentElement;
+const icon = btn.querySelector('i');
+const saved = localStorage.getItem('theme') || 'light';
+root.setAttribute('data-theme', saved);
+icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+btn.addEventListener('click', () => {
+  const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+});
 
-  const saved = localStorage.getItem('theme') || 'light';
-  root.setAttribute('data-theme', saved);
-  icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-
-  btn.addEventListener('click', () => {
-    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+// ── Active nav on scroll ────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
   });
+}, { threshold: 0.4 });
 
-  // ── Active nav link on scroll ─────────────────────────────
-  const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.nav-links a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { threshold: 0.4 });
-  sections.forEach(s => observer.observe(s));
+// ── Render from content.json ────────────────────────────────
+const REPO  = 'Nehemiahnganjo/nextlinkmw';
+const CACHE = 'nxlmw_content_v1';
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function render(c) {
+  // meta / title
+  document.title = c.site.title;
+  document.getElementById('meta-desc').content = c.site.description;
+
+  // nav
+  document.getElementById('nav-logo').innerHTML =
+    '<span>' + esc(c.site.logo.replace('Link',' </span>Link')) ;
+  // rebuild logo properly
+  const logoEl = document.getElementById('nav-logo');
+  const parts  = c.site.logo.split('Link');
+  logoEl.innerHTML = '<span>' + esc(parts[0]) + '</span>Link' + esc(parts[1] || '');
+
+  const cta = document.getElementById('nav-cta');
+  cta.textContent = c.nav.cta_text;
+  cta.href = c.nav.cta_href;
+
+  // hero
+  const hb = document.getElementById('hero-badge');
+  hb.innerHTML = '<i class="fas fa-map-marker-alt"></i> ' + esc(c.hero.badge);
+  document.getElementById('hero-heading').innerHTML =
+    esc(c.hero.heading_line1) + '<br/><em>' + esc(c.hero.heading_line2) + '</em>';
+  document.getElementById('hero-sub').textContent = c.hero.subtext;
+  const bp = document.getElementById('hero-btn-primary');
+  bp.textContent = c.hero.btn_primary_text; bp.href = c.hero.btn_primary_href;
+  const bg = document.getElementById('hero-btn-ghost');
+  bg.textContent = c.hero.btn_ghost_text;   bg.href = c.hero.btn_ghost_href;
+
+  // stats
+  document.getElementById('stats-grid').innerHTML = c.stats.map(s =>
+    `<div class="stat-tile"><div class="stat-num">${esc(s.number)}</div><div class="stat-lbl">${esc(s.label)}</div></div>`
+  ).join('');
+
+  // services
+  document.getElementById('svc-label').textContent = c.services.label;
+  document.getElementById('svc-title').innerHTML =
+    esc(c.services.title_line1) + '<br/>' + esc(c.services.title_line2);
+  document.getElementById('svc-sub').textContent = c.services.subtext;
+  document.getElementById('services-grid').innerHTML = c.services.items.map(s =>
+    `<div class="service-card">
+      <div class="svc-icon"><i class="fas ${esc(s.icon)}"></i></div>
+      <h3>${esc(s.title)}</h3>
+      <p>${esc(s.body)}</p>
+    </div>`
+  ).join('');
+
+  // why
+  document.getElementById('why-label').textContent = c.why.label;
+  document.getElementById('why-title').innerHTML =
+    esc(c.why.title_line1) + '<br/>' + esc(c.why.title_line2);
+  document.getElementById('why-panel-h').textContent = c.why.panel_heading;
+  document.getElementById('why-panel-p').textContent = c.why.panel_body;
+  document.getElementById('why-list').innerHTML = c.why.items.map(w =>
+    `<div class="why-item">
+      <div class="why-dot"><i class="fas ${esc(w.icon)}"></i></div>
+      <div><h4>${esc(w.title)}</h4><p>${esc(w.body)}</p></div>
+    </div>`
+  ).join('');
+
+  // projects
+  document.getElementById('proj-label').textContent = c.projects.label;
+  document.getElementById('proj-title').textContent = c.projects.title;
+  document.getElementById('proj-sub').textContent   = c.projects.subtext;
+  document.getElementById('projects-grid').innerHTML = c.projects.items.map(p =>
+    `<div class="project-card">
+      <h3>${esc(p.emoji)} ${esc(p.title)}</h3>
+      <p>${esc(p.body)}</p>
+      <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+    </div>`
+  ).join('');
+
+  // contact
+  document.getElementById('ct-label').textContent = c.contact.label;
+  document.getElementById('ct-title').textContent = c.contact.title;
+  document.getElementById('ct-sub').textContent   = c.contact.subtext;
+  const ctBtn = document.getElementById('ct-btn');
+  ctBtn.textContent = c.contact.btn_text;
+  ctBtn.href = c.contact.items[0].href;
+  document.getElementById('contact-grid').innerHTML = c.contact.items.map(i => {
+    const iconClass = i.icon.includes('fab') ? i.icon : 'fas ' + i.icon;
+    return `<div class="contact-card">
+      <div class="contact-icon"><i class="${esc(iconClass)}"></i></div>
+      <p>${esc(i.label)}</p>
+      <a href="${esc(i.href)}" ${i.href.startsWith('http') ? 'target="_blank"' : ''}>${esc(i.text)}</a>
+    </div>`;
+  }).join('');
+
+  // footer
+  document.getElementById('footer-text').innerHTML = c.footer.text
+    .replace('NextLink MW', '<span>NextLink MW</span>');
+
+  // start scroll observer after render
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+}
+
+// fetch with cache-bust for freshness
+fetch(`https://raw.githubusercontent.com/${REPO}/main/content.json?_=${Date.now()}`)
+  .then(r => r.json())
+  .then(c => { sessionStorage.setItem(CACHE, JSON.stringify(c)); render(c); })
+  .catch(() => {
+    const cached = sessionStorage.getItem(CACHE);
+    if (cached) render(JSON.parse(cached));
+  });
 </script>
-
 </body>
 </html>
