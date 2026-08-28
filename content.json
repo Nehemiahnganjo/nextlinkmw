@@ -16,7 +16,8 @@
     "btn_primary_text": "See What We Build",
     "btn_primary_href": "#services",
     "btn_ghost_text": "Talk to Us",
-    "btn_ghost_href": "#contact"
+    "btn_ghost_href": "#contact",
+    "photo": "https://nehemiahnganjo.github.io/nextlinkmw/photo.jpg"
   },
   "stats": [
     {
@@ -252,7 +253,7 @@
   "branding": {
     "accent_color": "#4A7FE0",
     "default_theme": "light",
-    "og_image": "",
+    "og_image": "https://nehemiahnganjo.github.io/nextlinkmw/photo.jpg",
     "favicon": ""
   },
   "social": {
