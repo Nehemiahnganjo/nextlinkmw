@@ -45,47 +45,56 @@
       {
         "icon": "fa-cash-register",
         "title": "POS & Retail Systems",
-        "body": "Sales, stock, receipts, daily reports. Works offline. Scales from a single till to a multi-branch operation."
+        "body": "Sales, stock, receipts, daily reports. Works offline. Scales from a single till to a multi-branch operation.",
+        "visible": true
       },
       {
         "icon": "fa-hotel",
         "title": "Lodge & Hotel PMS",
-        "body": "Room bookings, check-in/out, invoicing, housekeeping status. Everything a property needs to stop losing money to manual processes."
+        "body": "Room bookings, check-in/out, invoicing, housekeeping status. Everything a property needs to stop losing money to manual processes.",
+        "visible": true
       },
       {
         "icon": "fa-graduation-cap",
         "title": "School & College Systems",
-        "body": "Enrollment, timetables, grades, fee collection, and parent communication — all in one place, maintained by your own staff."
+        "body": "Enrollment, timetables, grades, fee collection, and parent communication — all in one place, maintained by your own staff.",
+        "visible": true
       },
       {
         "icon": "fa-landmark",
         "title": "SACCO & MFI Systems",
-        "body": "Member accounts, loan management, savings ledgers, interest calculations, and USSD mobile banking — RBM-aware and audit-ready."
+        "body": "Member accounts, loan management, savings ledgers, interest calculations, and USSD mobile banking — RBM-aware and audit-ready.",
+        "visible": true
       },
       {
         "icon": "fa-seedling",
         "title": "Farm & Agri Management",
-        "body": "Track livestock, crop cycles, inputs, harvests, and sales. Built for operations that run in the field, not just on a desktop."
+        "body": "Track livestock, crop cycles, inputs, harvests, and sales. Built for operations that run in the field, not just on a desktop.",
+        "visible": true
       },
       {
         "icon": "fa-mobile-screen",
         "title": "Android Mobile Apps",
-        "body": "Native Kotlin apps that connect to your backend and work the way your team actually works — fast, offline-capable, no browser required."
+        "body": "Native Kotlin apps that connect to your backend and work the way your team actually works — fast, offline-capable, no browser required.",
+        "visible": true
       },
       {
         "icon": "fa-globe",
         "title": "Business Websites & CMS",
-        "body": "Professional websites your staff can update without calling a developer. SEO-ready, mobile-friendly, and actually maintained."
+        "body": "Professional websites your staff can update without calling a developer. SEO-ready, mobile-friendly, and actually maintained.",
+        "visible": true
       },
       {
         "icon": "fa-microchip",
         "title": "IoT & Automation",
-        "body": "ESP32 and Raspberry Pi solutions for monitoring, control, and automation — sensor dashboards, MQTT pipelines, relay systems."
+        "body": "ESP32 and Raspberry Pi solutions for monitoring, control, and automation — sensor dashboards, MQTT pipelines, relay systems.",
+        "visible": true
       },
       {
         "icon": "fa-network-wired",
         "title": "Network & Infrastructure",
-        "body": "Cisco switches and routers, Windows Server, Active Directory, VPN, CCTV, VMware virtualisation, structured cabling — designed to stay up."
+        "body": "Cisco switches and routers, Windows Server, Active Directory, VPN, CCTV, VMware virtualisation, structured cabling — designed to stay up.",
+        "visible": true
       }
     ]
   },
@@ -132,7 +141,9 @@
           "JavaScript",
           "CMS",
           "Live"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       },
       {
         "emoji": "🏦",
@@ -142,7 +153,9 @@
           "Python",
           "SQLite",
           "Offline-first"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       },
       {
         "emoji": "🏠",
@@ -153,7 +166,9 @@
           "Laravel",
           "Android",
           "MQTT"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       },
       {
         "emoji": "🐧",
@@ -163,7 +178,9 @@
           "Bash",
           "Archiso",
           "Linux"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       },
       {
         "emoji": "🤖",
@@ -174,7 +191,9 @@
           "AI",
           "Voice",
           "Local"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       },
       {
         "emoji": "⚽",
@@ -185,7 +204,9 @@
           "ML",
           "Poisson",
           "7 Leagues"
-        ]
+        ],
+        "visible": true,
+        "link": ""
       }
     ]
   },
@@ -219,9 +240,29 @@
         "text": "Rumphi, Malawi 🇲🇼",
         "href": "#"
       }
-    ]
+    ],
+    "business_hours": "Mon – Fri: 08:00 – 17:00 (CAT)",
+    "maps_embed": ""
   },
   "footer": {
     "text": "© 2026 NextLink MW · Custom IT Solutions, Malawi · Built by Nehemiah Ng'anjo"
+  },
+  "branding": {
+    "accent_color": "#4A7FE0",
+    "default_theme": "light",
+    "og_image": "",
+    "favicon": ""
+  },
+  "social": {
+    "whatsapp_number": "265882730381",
+    "whatsapp_prefill": "Hi, I'd like to enquire about your IT services.",
+    "facebook": "",
+    "twitter": "",
+    "github": "https://github.com/Nehemiahnganjo",
+    "linkedin": "https://linkedin.com/in/nehemiah-ng-anjo-773ba01b5"
+  },
+  "analytics": {
+    "ga4_id": "",
+    "enabled": false
   }
 }
