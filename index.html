@@ -1,192 +1,283 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NextLink MW | IT Solutions Malawi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── TOKENS ─────────────────────────────────────────────── */
     :root {
-      --primary: #0f172a;
-      --accent: #0ea5e9;
-      --accent2: #6366f1;
-      --light: #f8fafc;
-      --muted: #64748b;
-      --border: #e2e8f0;
+      --bg-base:   #E9EEF3;
+      --bg-card:   #EEF2F6;
+      --bg-inset:  #E3E8ED;
+      --tx-1: #2E3A46; --tx-2: #6B7A89; --tx-3: #A3AFBC;
+      --acc-green: #4CB963; --acc-green-bg: #E4F5E8;
+      --acc-red:   #E4574C; --acc-red-bg:   #FBE7E5;
+      --acc-blue:  #4A7FE0;
+      --sh-l: rgba(255,255,255,0.85);
+      --sh-d: rgba(163,177,198,0.55);
+      --r-sm: 14px; --r-md: 20px; --r-lg: 28px;
+      --raised:    -6px -6px 14px var(--sh-l),  6px  6px 14px var(--sh-d);
+      --raised-lg: -10px -10px 24px var(--sh-l), 10px 10px 24px var(--sh-d);
+      --inset:     inset -4px -4px 10px var(--sh-l), inset 4px 4px 10px var(--sh-d);
+      --t-fast: 100ms ease-in-out;
+      --t-norm: 200ms ease-in-out;
+      --t-slow: 350ms ease-in-out;
     }
+    [data-theme="dark"] {
+      --bg-base:   #1C2126; --bg-card: #21262C; --bg-inset: #171B1F;
+      --tx-1: #E8ECF0; --tx-2: #9AA5B1; --tx-3: #626C77;
+      --acc-green: #5FD37D; --acc-green-bg: #1E3324;
+      --acc-red:   #F2695E; --acc-red-bg:   #3A2220;
+      --acc-blue:  #6B9BFF;
+      --sh-l: rgba(255,255,255,0.04);
+      --sh-d: rgba(0,0,0,0.55);
+    }
+
+    /* ── BASE ───────────────────────────────────────────────── */
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: #fff; color: var(--primary); }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-base);
+      color: var(--tx-1);
+      transition: background var(--t-slow), color var(--t-slow);
+    }
 
-    /* NAV */
+    /* ── UTILITIES ──────────────────────────────────────────── */
+    .neu-card  { background: var(--bg-card);  border-radius: var(--r-md); box-shadow: var(--raised);    padding: 24px; }
+    .neu-hero  { background: var(--bg-card);  border-radius: var(--r-lg); box-shadow: var(--raised-lg); padding: 32px; }
+    .neu-inset { background: var(--bg-inset); border-radius: var(--r-md); box-shadow: var(--inset);     padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+    section { padding: 88px 0; }
+    .label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--acc-blue); margin-bottom: 8px;
+    }
+    .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: var(--tx-1); margin-bottom: 12px; line-height: 1.25; }
+    .section-sub   { color: var(--tx-2); font-size: 0.95rem; max-width: 500px; line-height: 1.8; }
+
+    /* ── NAV ────────────────────────────────────────────────── */
     nav {
-      position: fixed; top: 0; width: 100%; z-index: 100;
-      background: rgba(15,23,42,0.95); backdrop-filter: blur(10px);
-      padding: 16px 40px; display: flex; justify-content: space-between; align-items: center;
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 200; width: calc(100% - 48px); max-width: 1080px;
+      background: var(--bg-card);
+      border-radius: var(--r-lg);
+      box-shadow: var(--raised-lg);
+      padding: 14px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: box-shadow var(--t-norm), background var(--t-slow);
     }
-    .logo { font-size: 1.3rem; font-weight: 800; color: #fff; text-decoration: none; }
-    .logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 28px; list-style: none; }
-    .nav-links a { color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: #fff; }
+    .logo { font-size: 1.2rem; font-weight: 800; color: var(--tx-1); text-decoration: none; }
+    .logo span { color: var(--acc-blue); }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a {
+      color: var(--tx-2); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+      padding: 8px 14px; border-radius: var(--r-sm);
+      transition: color var(--t-norm), box-shadow var(--t-norm), background var(--t-norm);
+    }
+    .nav-links a:hover { color: var(--tx-1); }
+    .nav-links a.active {
+      color: var(--acc-blue);
+      box-shadow: var(--inset);
+      background: var(--bg-inset);
+    }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav-cta {
-      background: var(--accent); color: #fff; padding: 8px 20px;
-      border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-      text-decoration: none; transition: background 0.2s;
+      background: var(--acc-blue); color: #fff;
+      padding: 9px 20px; border-radius: var(--r-sm);
+      font-size: 0.82rem; font-weight: 600; text-decoration: none;
+      box-shadow: var(--raised); transition: box-shadow var(--t-fast), transform var(--t-fast);
     }
-    .nav-cta:hover { background: #0284c7; }
+    .nav-cta:hover  { transform: translateY(-1px); }
+    .nav-cta:active { box-shadow: var(--inset); transform: translateY(0); }
 
-    /* HERO */
+    /* Theme toggle */
+    #theme-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--bg-card); box-shadow: var(--raised);
+      border: none; cursor: pointer; color: var(--tx-2);
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: box-shadow var(--t-fast), color var(--t-norm);
+    }
+    #theme-btn:hover  { color: var(--acc-blue); }
+    #theme-btn:active { box-shadow: var(--inset); }
+
+    /* ── HERO ───────────────────────────────────────────────── */
     #hero {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0c4a6e 100%);
       display: flex; align-items: center; justify-content: center;
-      text-align: center; padding: 100px 20px 60px;
-      position: relative; overflow: hidden;
+      text-align: center; padding: 140px 24px 80px;
     }
-    #hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 70% 50%, rgba(14,165,233,0.15) 0%, transparent 60%),
-                  radial-gradient(ellipse at 30% 80%, rgba(99,102,241,0.1) 0%, transparent 50%);
-    }
+    .hero-inner { max-width: 680px; }
     .hero-badge {
-      display: inline-block; background: rgba(14,165,233,0.15);
-      border: 1px solid rgba(14,165,233,0.3); color: var(--accent);
-      padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
-      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      border-radius: 99px; padding: 6px 18px;
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--acc-blue); letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 28px;
     }
+    .hero-badge i { font-size: 0.7rem; }
     #hero h1 {
-      font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800;
-      color: #fff; line-height: 1.15; margin-bottom: 20px;
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 20px; color: var(--tx-1);
     }
-    #hero h1 span { color: var(--accent); }
-    #hero p {
-      font-size: 1.1rem; color: #94a3b8; max-width: 580px;
-      margin: 0 auto 36px; line-height: 1.8;
-    }
+    #hero h1 em { font-style: normal; color: var(--acc-blue); }
+    #hero p { font-size: 1rem; color: var(--tx-2); line-height: 1.85; margin-bottom: 40px; }
     .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .btn-primary {
-      background: var(--accent); color: #fff; padding: 14px 32px;
-      border-radius: 8px; font-weight: 600; text-decoration: none;
-      font-size: 0.95rem; transition: background 0.2s, transform 0.2s;
+      background: var(--acc-blue); color: #fff; padding: 14px 32px;
+      border-radius: var(--r-sm); font-weight: 600; font-size: 0.92rem;
+      text-decoration: none; box-shadow: var(--raised);
+      transition: box-shadow var(--t-fast), transform var(--t-fast);
     }
-    .btn-primary:hover { background: #0284c7; transform: translateY(-2px); }
-    .btn-outline {
-      border: 2px solid rgba(255,255,255,0.2); color: #fff; padding: 14px 32px;
-      border-radius: 8px; font-weight: 600; text-decoration: none;
-      font-size: 0.95rem; transition: border-color 0.2s, transform 0.2s;
+    .btn-primary:hover  { transform: translateY(-2px); }
+    .btn-primary:active { box-shadow: var(--inset); transform: translateY(0); }
+    .btn-ghost {
+      background: var(--bg-card); color: var(--tx-1); padding: 14px 32px;
+      border-radius: var(--r-sm); font-weight: 600; font-size: 0.92rem;
+      text-decoration: none; box-shadow: var(--raised);
+      transition: box-shadow var(--t-fast), transform var(--t-fast);
     }
-    .btn-outline:hover { border-color: #fff; transform: translateY(-2px); }
+    .btn-ghost:hover  { transform: translateY(-2px); }
+    .btn-ghost:active { box-shadow: var(--inset); transform: translateY(0); }
 
-    /* STATS */
-    .stats {
-      background: var(--primary); padding: 40px 20px;
-      display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;
+    /* ── STATS BAR ──────────────────────────────────────────── */
+    .stats-bar { padding: 0 0 80px; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
     }
-    .stat { text-align: center; }
-    .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); }
-    .stat-label { font-size: 0.82rem; color: #64748b; margin-top: 4px; }
-
-    /* SECTIONS */
-    section { padding: 80px 20px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+    .stat-tile {
+      background: var(--bg-card); border-radius: var(--r-md); box-shadow: var(--raised);
+      padding: 24px; text-align: center;
+      transition: box-shadow var(--t-norm);
     }
-    .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 14px; }
-    .section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; line-height: 1.7; }
+    .stat-tile:hover { box-shadow: var(--raised-lg); }
+    .stat-num  { font-size: 2.2rem; font-weight: 800; color: var(--acc-blue); line-height: 1; }
+    .stat-lbl  { font-size: 0.78rem; color: var(--tx-2); margin-top: 6px; font-weight: 500; }
 
-    /* SERVICES */
-    #services { background: var(--light); }
+    /* ── SERVICES ───────────────────────────────────────────── */
+    #services { background: var(--bg-base); }
     .services-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px; margin-top: 50px;
+      gap: 20px; margin-top: 48px;
     }
     .service-card {
-      background: #fff; border-radius: 12px; padding: 28px;
-      border: 1px solid var(--border);
-      transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+      background: var(--bg-card); border-radius: var(--r-md); box-shadow: var(--raised);
+      padding: 28px; transition: box-shadow var(--t-norm), transform var(--t-norm);
     }
-    .service-card:hover {
-      box-shadow: 0 12px 40px rgba(14,165,233,0.12);
-      transform: translateY(-4px); border-color: #7dd3fc;
-    }
-    .service-icon {
-      width: 52px; height: 52px; border-radius: 12px;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    .service-card:hover { box-shadow: var(--raised-lg); transform: translateY(-3px); }
+    .svc-icon {
+      width: 52px; height: 52px; border-radius: var(--r-sm);
+      background: var(--bg-inset); box-shadow: var(--inset);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; color: #fff; margin-bottom: 18px;
+      font-size: 1.3rem; color: var(--acc-blue); margin-bottom: 18px;
     }
-    .service-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
-    .service-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
+    .service-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--tx-1); }
+    .service-card p  { font-size: 0.84rem; color: var(--tx-2); line-height: 1.75; }
 
-    /* WHY US */
-    #why { background: #fff; }
-    .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; margin-top: 50px; }
-    .why-item { display: flex; gap: 16px; margin-bottom: 28px; }
-    .why-icon { font-size: 1.3rem; color: var(--accent); margin-top: 2px; flex-shrink: 0; }
-    .why-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
-    .why-item p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
-    .why-visual {
-      background: linear-gradient(135deg, #0f172a, #1e3a5f);
-      border-radius: 16px; padding: 40px; color: #fff; text-align: center;
+    /* ── WHY ────────────────────────────────────────────────── */
+    #why { background: var(--bg-base); }
+    .why-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 48px; }
+    .why-list { display: flex; flex-direction: column; gap: 20px; }
+    .why-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--bg-card); border-radius: var(--r-md); box-shadow: var(--raised);
+      padding: 20px;
+      transition: box-shadow var(--t-norm);
     }
-    .why-visual i { font-size: 4rem; color: var(--accent); margin-bottom: 20px; display: block; }
-    .why-visual h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
-    .why-visual p { font-size: 0.88rem; color: #94a3b8; line-height: 1.7; }
+    .why-item:hover { box-shadow: var(--raised-lg); }
+    .why-dot {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--acc-blue); font-size: 0.85rem;
+    }
+    .why-item h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; color: var(--tx-1); }
+    .why-item p  { font-size: 0.82rem; color: var(--tx-2); line-height: 1.6; }
+    .why-panel {
+      background: var(--bg-card); border-radius: var(--r-lg); box-shadow: var(--raised-lg);
+      padding: 40px; text-align: center;
+    }
+    .why-panel-dial {
+      width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 28px;
+      background: var(--bg-card); box-shadow: var(--raised-lg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .why-panel-dial .inner {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; color: var(--acc-blue);
+    }
+    .why-panel h3 { font-size: 1.15rem; font-weight: 700; color: var(--tx-1); margin-bottom: 10px; }
+    .why-panel p  { font-size: 0.86rem; color: var(--tx-2); line-height: 1.75; }
 
-    /* PROJECTS */
-    #projects { background: var(--light); }
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 50px; }
+    /* ── PROJECTS ───────────────────────────────────────────── */
+    #projects { background: var(--bg-base); }
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px; margin-top: 48px;
+    }
     .project-card {
-      background: #fff; border-radius: 12px; overflow: hidden;
-      border: 1px solid var(--border); transition: box-shadow 0.3s, transform 0.3s;
+      background: var(--bg-card); border-radius: var(--r-md); box-shadow: var(--raised);
+      padding: 24px; transition: box-shadow var(--t-norm), transform var(--t-norm);
     }
-    .project-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.08); transform: translateY(-4px); }
-    .project-top {
-      height: 8px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-    }
-    .project-body { padding: 24px; }
-    .project-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-    .project-body p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+    .project-card:hover { box-shadow: var(--raised-lg); transform: translateY(-3px); }
+    .project-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--tx-1); }
+    .project-card p  { font-size: 0.83rem; color: var(--tx-2); line-height: 1.7; margin-bottom: 14px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .tag {
-      display: inline-block; background: #eff6ff; color: #1d4ed8;
-      border: 1px solid #bfdbfe; border-radius: 20px;
-      padding: 3px 10px; font-size: 0.75rem; font-weight: 500; margin: 2px;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      border-radius: 99px; padding: 4px 12px;
+      font-size: 0.72rem; font-weight: 600; color: var(--acc-blue);
     }
 
-    /* CONTACT */
-    #contact { background: linear-gradient(135deg, #0f172a, #1e3a5f); color: #fff; text-align: center; }
-    #contact .section-label { color: var(--accent); }
-    #contact .section-title { color: #fff; }
-    #contact .section-sub { color: #94a3b8; margin: 0 auto 40px; }
-    .contact-cards { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
+    /* ── CONTACT ────────────────────────────────────────────── */
+    #contact { background: var(--bg-base); text-align: center; }
+    .contact-grid {
+      display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 48px 0;
+    }
     .contact-card {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px; padding: 24px 32px; text-align: center; min-width: 180px;
-      transition: background 0.2s;
+      background: var(--bg-card); border-radius: var(--r-md); box-shadow: var(--raised);
+      padding: 28px 32px; min-width: 180px; text-align: center;
+      transition: box-shadow var(--t-norm), transform var(--t-norm);
     }
-    .contact-card:hover { background: rgba(255,255,255,0.08); }
-    .contact-card i { font-size: 1.5rem; color: var(--accent); margin-bottom: 10px; display: block; }
-    .contact-card p { font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; }
-    .contact-card a { color: #fff; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .contact-card:hover { box-shadow: var(--raised-lg); transform: translateY(-3px); }
+    .contact-icon {
+      width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 14px;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--acc-blue);
+    }
+    .contact-card p   { font-size: 0.75rem; color: var(--tx-3); margin-bottom: 4px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .contact-card a   { color: var(--tx-1); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color var(--t-norm); }
+    .contact-card a:hover { color: var(--acc-blue); }
 
-    /* FOOTER */
+    /* ── FOOTER ─────────────────────────────────────────────── */
     footer {
-      background: #020617; color: #475569;
-      text-align: center; padding: 24px 20px; font-size: 0.82rem;
+      background: var(--bg-card); box-shadow: var(--raised);
+      text-align: center; padding: 24px 20px;
+      font-size: 0.8rem; color: var(--tx-3);
     }
-    footer span { color: var(--accent); }
+    footer span { color: var(--acc-blue); }
 
+    /* ── FOCUS ──────────────────────────────────────────────── */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--acc-blue); outline-offset: 3px; border-radius: 4px;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
     @media (max-width: 768px) {
-      nav { padding: 14px 20px; }
+      nav { top: 10px; width: calc(100% - 24px); padding: 12px 16px; }
       .nav-links { display: none; }
-      .why-grid { grid-template-columns: 1fr; }
-      .stats { gap: 30px; }
+      .why-wrap   { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .container  { padding: 0 16px; }
     }
   </style>
 </head>
@@ -201,81 +292,88 @@
     <li><a href="#projects">Projects</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a class="nav-cta" href="#contact">Get a Quote</a>
+  <div class="nav-right">
+    <button id="theme-btn" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+    <a class="nav-cta" href="#contact">Get a Quote</a>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
-  <div style="position:relative;z-index:1;">
-    <div class="hero-badge"><i class="fas fa-bolt"></i> &nbsp; IT Solutions · Malawi</div>
-    <h1>Reliable IT Solutions<br/>for <span>Modern Businesses</span></h1>
-    <p>From network infrastructure and web development to financial software and cybersecurity — we deliver end-to-end IT services tailored for Malawian businesses.</p>
+  <div class="hero-inner">
+    <div class="hero-badge"><i class="fas fa-bolt"></i> IT Solutions · Malawi</div>
+    <h1>Reliable IT for<br/><em>Modern Businesses</em></h1>
+    <p>From network infrastructure and custom software to financial systems and IoT — end-to-end IT built for Malawian businesses, delivered by someone who actually knows what they're doing.</p>
     <div class="hero-btns">
-      <a class="btn-primary" href="#services">Explore Services</a>
-      <a class="btn-outline" href="#contact">Contact Us</a>
+      <a class="btn-primary" href="#services">See Services</a>
+      <a class="btn-ghost"   href="#contact">Get in Touch</a>
     </div>
   </div>
 </section>
 
 <!-- STATS -->
-<div class="stats">
-  <div class="stat"><div class="stat-num">5+</div><div class="stat-label">Years Experience</div></div>
-  <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Projects Delivered</div></div>
-  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Client Focused</div></div>
-  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Support Available</div></div>
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-tile"><div class="stat-num">5+</div><div class="stat-lbl">Years Experience</div></div>
+      <div class="stat-tile"><div class="stat-num">10+</div><div class="stat-lbl">Projects Delivered</div></div>
+      <div class="stat-tile"><div class="stat-num">100%</div><div class="stat-lbl">Client Focused</div></div>
+      <div class="stat-tile"><div class="stat-num">24/7</div><div class="stat-lbl">Support Available</div></div>
+    </div>
+  </div>
 </div>
 
 <!-- SERVICES -->
 <section id="services">
   <div class="container">
-    <div class="section-label">What We Do</div>
-    <div class="section-title">Custom Software Development</div>
-    <p class="section-sub">I build custom business software — if you need it, I can build it. Based in Malawi 🇲🇼 — working with clients locally and remotely.</p>
+    <div class="label">What We Do</div>
+    <div class="section-title">Custom Software &amp; IT Services</div>
+    <p class="section-sub">If you need it built, it can be built. Based in Malawi 🇲🇼 — local and remote.</p>
     <div class="services-grid">
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-cash-register"></i></div>
-        <h3>POS & Retail Systems</h3>
-        <p>Point of sale, inventory management, receipts, and sales reports tailored for your retail business.</p>
+        <div class="svc-icon"><i class="fas fa-cash-register"></i></div>
+        <h3>POS &amp; Retail Systems</h3>
+        <p>Point of sale, inventory management, receipts, and sales reports tailored for your business.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-hotel"></i></div>
-        <h3>Lodge & Hotel Management</h3>
-        <p>Bookings, check-in/out, billing, and room management systems for hospitality businesses.</p>
+        <div class="svc-icon"><i class="fas fa-hotel"></i></div>
+        <h3>Lodge &amp; Hotel Management</h3>
+        <p>Bookings, check-in/out, billing, and room management for hospitality businesses.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="svc-icon"><i class="fas fa-graduation-cap"></i></div>
         <h3>Student Management Systems</h3>
         <p>Enrollment, grades, fees, and timetable management for schools and colleges.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-landmark"></i></div>
-        <h3>SACCO & Banking Systems</h3>
-        <p>Loans, savings, member accounts, and USSD mobile banking integration for SACCOs and financial institutions.</p>
+        <div class="svc-icon"><i class="fas fa-landmark"></i></div>
+        <h3>SACCO &amp; Banking Systems</h3>
+        <p>Loans, savings, member accounts, and USSD mobile banking for financial institutions.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-seedling"></i></div>
-        <h3>Farm Management Systems</h3>
-        <p>Livestock, crops, inventory, and sales tracking for agricultural businesses.</p>
+        <div class="svc-icon"><i class="fas fa-seedling"></i></div>
+        <h3>Farm Management</h3>
+        <p>Livestock, crops, inventory, and sales tracking for agricultural operations.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-mobile-screen"></i></div>
+        <div class="svc-icon"><i class="fas fa-mobile-screen"></i></div>
         <h3>Android Mobile Apps</h3>
-        <p>Native Kotlin Android apps connected to your backend — built for performance and usability.</p>
+        <p>Native Kotlin Android apps — built for performance, connected to your backend.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-globe"></i></div>
+        <div class="svc-icon"><i class="fas fa-globe"></i></div>
         <h3>Business Websites + CMS</h3>
-        <p>Full websites with content management panels, SEO-ready and easy for non-technical staff to update.</p>
+        <p>Full sites with CMS panels — SEO-ready, easy for non-technical staff to manage.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-microchip"></i></div>
-        <h3>IoT & Automation</h3>
-        <p>ESP32/Raspberry Pi dashboards, sensor monitoring, MQTT pipelines, and Python automation scripts.</p>
+        <div class="svc-icon"><i class="fas fa-microchip"></i></div>
+        <h3>IoT &amp; Automation</h3>
+        <p>ESP32/Raspberry Pi dashboards, sensor monitoring, MQTT pipelines, automation scripts.</p>
       </div>
       <div class="service-card">
-        <div class="service-icon"><i class="fas fa-network-wired"></i></div>
-        <h3>Network & IT Infrastructure</h3>
-        <p>Cisco networking, Windows Server, Active Directory, VPN, CCTV, VMware virtualization, and full IT support.</p>
+        <div class="svc-icon"><i class="fas fa-network-wired"></i></div>
+        <h3>Network &amp; IT Infrastructure</h3>
+        <p>Cisco networking, Windows Server, Active Directory, VPN, CCTV, VMware, full IT support.</p>
       </div>
     </div>
   </div>
@@ -284,33 +382,45 @@
 <!-- WHY US -->
 <section id="why">
   <div class="container">
-    <div class="why-grid">
-      <div>
-        <div class="section-label">Why Choose Us</div>
-        <div class="section-title">Local Expertise,<br/>Enterprise Quality</div>
-        <div style="margin-top:30px;">
-          <div class="why-item">
-            <i class="fas fa-check-circle why-icon"></i>
-            <div><h4>5+ Years Hands-On Experience</h4><p>Proven track record managing full IT infrastructure for financial institutions in Malawi.</p></div>
+    <div class="label">Why Choose Us</div>
+    <div class="section-title">Local Expertise,<br/>Enterprise Quality</div>
+    <div class="why-wrap">
+      <div class="why-list">
+        <div class="why-item">
+          <div class="why-dot"><i class="fas fa-check"></i></div>
+          <div>
+            <h4>5+ Years Hands-On Experience</h4>
+            <p>Proven track record managing full IT infrastructure for financial institutions across Malawi.</p>
           </div>
-          <div class="why-item">
-            <i class="fas fa-check-circle why-icon"></i>
-            <div><h4>End-to-End IT Management</h4><p>From cabling to custom software — one team handles everything so you don't have to coordinate multiple vendors.</p></div>
+        </div>
+        <div class="why-item">
+          <div class="why-dot"><i class="fas fa-check"></i></div>
+          <div>
+            <h4>End-to-End Delivery</h4>
+            <p>From cabling to custom software — one person handles everything. No vendor juggling.</p>
           </div>
-          <div class="why-item">
-            <i class="fas fa-check-circle why-icon"></i>
-            <div><h4>RBM-Compliant Solutions</h4><p>Experience with Reserve Bank of Malawi data security standards and MUSCCO/MFI-Hub collaboration.</p></div>
+        </div>
+        <div class="why-item">
+          <div class="why-dot"><i class="fas fa-check"></i></div>
+          <div>
+            <h4>RBM-Compliant Solutions</h4>
+            <p>Experience with Reserve Bank of Malawi security standards and MUSCCO/MFI-Hub collaboration.</p>
           </div>
-          <div class="why-item">
-            <i class="fas fa-check-circle why-icon"></i>
-            <div><h4>Rural & Urban Coverage</h4><p>We understand the unique challenges of deploying IT in both urban centres and rural Malawi.</p></div>
+        </div>
+        <div class="why-item">
+          <div class="why-dot"><i class="fas fa-check"></i></div>
+          <div>
+            <h4>Rural &amp; Urban Coverage</h4>
+            <p>We understand deploying IT in both urban centres and rural Malawi — because we've done it.</p>
           </div>
         </div>
       </div>
-      <div class="why-visual">
-        <i class="fas fa-laptop-code"></i>
+      <div class="why-panel">
+        <div class="why-panel-dial">
+          <div class="inner"><i class="fas fa-laptop-code"></i></div>
+        </div>
         <h3>Built for Malawian Businesses</h3>
-        <p>We combine international best practices with deep local knowledge to deliver IT solutions that actually work in the Malawian context — reliable, affordable, and scalable.</p>
+        <p>International best practices. Deep local knowledge. IT solutions that actually work in the Malawian context — reliable, affordable, scalable.</p>
       </div>
     </div>
   </div>
@@ -319,73 +429,39 @@
 <!-- PROJECTS -->
 <section id="projects">
   <div class="container">
-    <div class="section-label">Our Work</div>
+    <div class="label">Our Work</div>
     <div class="section-title">Featured Projects</div>
-    <p class="section-sub">Real solutions built and deployed.</p>
+    <p class="section-sub">Real solutions. Real users. Real problems solved.</p>
     <div class="projects-grid">
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🐧 Nganjo OS</h3>
-          <p>Custom Arch Linux distro — GNOME edition live, KDE coming soon. Built from scratch for a tailored Linux experience.</p>
-          <span class="tag">Bash</span><span class="tag">Archiso</span><span class="tag">Linux</span>
-        </div>
+        <h3>🐧 Nganjo OS</h3>
+        <p>Custom Arch Linux distro — GNOME on Wayland. Built from scratch for a tailored Linux experience.</p>
+        <div class="tags"><span class="tag">Bash</span><span class="tag">Archiso</span><span class="tag">Linux</span></div>
       </div>
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🤖 Atarah Assistant</h3>
-          <p>Original AGI concept — self-aware AI assistant with voice, memory, reasoning, and system integration.</p>
-          <span class="tag">Python</span><span class="tag">AI/LLM</span><span class="tag">Voice</span>
-        </div>
+        <h3>🤖 Atarah Assistant</h3>
+        <p>Original AGI concept — self-aware AI with voice, memory, reasoning, and full system integration.</p>
+        <div class="tags"><span class="tag">Python</span><span class="tag">AI</span><span class="tag">Voice</span></div>
       </div>
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🧠 Brain AI</h3>
-          <p>AI assistant evolution — v1 prototype through v2.1 Django web app with progressive intelligence improvements.</p>
-          <span class="tag">Python</span><span class="tag">Django</span><span class="tag">AI</span>
-        </div>
+        <h3>🏦 Karonga Village Bank</h3>
+        <p>Village banking system — member accounts, loans, and savings management. A whole bank.</p>
+        <div class="tags"><span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Fintech</span></div>
       </div>
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🏦 Karonga Village Bank</h3>
-          <p>Village banking system for Bank Mmuzi — member accounts, loans, and savings management.</p>
-          <span class="tag">Python</span><span class="tag">SQLite</span><span class="tag">Fintech</span>
-        </div>
+        <h3>🏠 Next Smart Home</h3>
+        <p>ESP32 + Laravel + Android home automation. MQTT over TLS, real-time WebSockets, relay control.</p>
+        <div class="tags"><span class="tag">ESP32</span><span class="tag">Laravel</span><span class="tag">Android</span></div>
       </div>
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>💳 Sacco Glass CMS Hub</h3>
-          <p>Modern SACCO management platform with a glass-morphism UI and full CMS capabilities.</p>
-          <span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">SACCO</span>
-        </div>
+        <h3>⚽ Bet Neural</h3>
+        <p>Football match predictor — Poisson + ensemble ML trained on 6 years of data across 7 leagues.</p>
+        <div class="tags"><span class="tag">Python</span><span class="tag">ML</span><span class="tag">Poisson</span></div>
       </div>
       <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🌾 Super Farm</h3>
-          <p>Full farm management system — livestock, crops, inventory, and sales tracking built with Laravel.</p>
-          <span class="tag">PHP</span><span class="tag">Laravel</span><span class="tag">MySQL</span>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🌐 uniquesacco.com</h3>
-          <p>Live SACCO business website with floating CMS panel and session-persistent content editing for non-technical staff.</p>
-          <span class="tag">PHP</span><span class="tag">JavaScript</span><span class="tag">CMS</span>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-top"></div>
-        <div class="project-body">
-          <h3>🖼️ Art Gallery</h3>
-          <p>Gallery web application combining Laravel and Django backends with a clean frontend interface.</p>
-          <span class="tag">PHP</span><span class="tag">Python</span><span class="tag">Laravel</span>
-        </div>
+        <h3>🌐 uniquesacco.com</h3>
+        <p>Live SACCO platform — website, CMS panel, member portal. Real money. Real people.</p>
+        <div class="tags"><span class="tag">PHP</span><span class="tag">JavaScript</span><span class="tag">CMS</span></div>
       </div>
     </div>
   </div>
@@ -394,38 +470,70 @@
 <!-- CONTACT -->
 <section id="contact">
   <div class="container">
-    <div class="section-label">Get In Touch</div>
+    <div class="label">Get In Touch</div>
     <div class="section-title">Let's Work Together</div>
-    <p class="section-sub">Ready to upgrade your IT infrastructure? Get in touch and we'll find the right solution for your business.</p>
-    <div class="contact-cards">
+    <p class="section-sub" style="margin:0 auto;">Ready to sort out your IT? Get in touch and we'll figure out the right solution.</p>
+    <div class="contact-grid">
       <div class="contact-card">
-        <i class="fas fa-envelope"></i>
+        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
         <p>Email</p>
         <a href="mailto:nehemiahnganjo@outlook.com">nehemiahnganjo@outlook.com</a>
       </div>
       <div class="contact-card">
-        <i class="fas fa-phone"></i>
-        <p>Phone / WhatsApp</p>
-        <a href="tel:+2650882730381">+265 0882 730 381</a>
+        <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+        <p>WhatsApp</p>
+        <a href="https://wa.me/265882730381" target="_blank">+265 882 730 381</a>
       </div>
       <div class="contact-card">
-        <i class="fab fa-linkedin"></i>
+        <div class="contact-icon"><i class="fab fa-linkedin"></i></div>
         <p>LinkedIn</p>
         <a href="https://linkedin.com/in/nehemiah-ng-anjo-773ba01b5" target="_blank">Nehemiah Ng'anjo</a>
       </div>
       <div class="contact-card">
-        <i class="fas fa-map-marker-alt"></i>
+        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
         <p>Location</p>
-        <a href="#">Rumphi, Malawi</a>
+        <a href="#">Rumphi, Malawi 🇲🇼</a>
       </div>
     </div>
-    <a class="btn-primary" href="mailto:nehemiahnganjo@outlook.com">Send Us a Message</a>
+    <a class="btn-primary" href="mailto:nehemiahnganjo@outlook.com">Send a Message</a>
   </div>
 </section>
 
 <footer>
-  <p>© 2026 <span>NextLink MW</span> · IT Solutions Malawi · All rights reserved</p>
+  <p>© 2026 <span>NextLink MW</span> · IT Solutions Malawi</p>
 </footer>
+
+<script>
+  // ── Theme toggle ──────────────────────────────────────────
+  const btn  = document.getElementById('theme-btn');
+  const root = document.documentElement;
+  const icon = btn.querySelector('i');
+
+  const saved = localStorage.getItem('theme') || 'light';
+  root.setAttribute('data-theme', saved);
+  icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  });
+
+  // ── Active nav link on scroll ─────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.nav-links a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => observer.observe(s));
+</script>
 
 </body>
 </html>
