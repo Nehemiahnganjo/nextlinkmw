@@ -1,0 +1,227 @@
+{
+  "site": {
+    "title": "NextLink MW | IT Solutions Malawi",
+    "description": "Custom software, IT infrastructure, and network solutions for businesses in Malawi.",
+    "logo": "NextLink MW"
+  },
+  "nav": {
+    "cta_text": "Get a Quote",
+    "cta_href": "#contact"
+  },
+  "hero": {
+    "badge": "Rumphi, Malawi · Local & Remote",
+    "heading_line1": "Your IT Problems,",
+    "heading_line2": "Permanently Solved",
+    "subtext": "Custom software. Network infrastructure. Financial systems. IoT. If your business has an IT problem that spreadsheets and off-the-shelf software can't fix — that's exactly what NextLink MW is for.",
+    "btn_primary_text": "See What We Build",
+    "btn_primary_href": "#services",
+    "btn_ghost_text": "Talk to Us",
+    "btn_ghost_href": "#contact"
+  },
+  "stats": [
+    {
+      "number": "5+",
+      "label": "Years in the Field"
+    },
+    {
+      "number": "10+",
+      "label": "Systems Deployed"
+    },
+    {
+      "number": "7+",
+      "label": "Industries Served"
+    },
+    {
+      "number": "24/7",
+      "label": "Support Available"
+    }
+  ],
+  "services": {
+    "label": "What We Build",
+    "title_line1": "Software That Fits",
+    "title_line2": "Your Business — Not the Other Way Round",
+    "subtext": "Every system is built from scratch for your specific workflows. No bloated templates, no licensing fees, no features you'll never use.",
+    "items": [
+      {
+        "icon": "fa-cash-register",
+        "title": "POS & Retail Systems",
+        "body": "Sales, stock, receipts, daily reports. Works offline. Scales from a single till to a multi-branch operation."
+      },
+      {
+        "icon": "fa-hotel",
+        "title": "Lodge & Hotel PMS",
+        "body": "Room bookings, check-in/out, invoicing, housekeeping status. Everything a property needs to stop losing money to manual processes."
+      },
+      {
+        "icon": "fa-graduation-cap",
+        "title": "School & College Systems",
+        "body": "Enrollment, timetables, grades, fee collection, and parent communication — all in one place, maintained by your own staff."
+      },
+      {
+        "icon": "fa-landmark",
+        "title": "SACCO & MFI Systems",
+        "body": "Member accounts, loan management, savings ledgers, interest calculations, and USSD mobile banking — RBM-aware and audit-ready."
+      },
+      {
+        "icon": "fa-seedling",
+        "title": "Farm & Agri Management",
+        "body": "Track livestock, crop cycles, inputs, harvests, and sales. Built for operations that run in the field, not just on a desktop."
+      },
+      {
+        "icon": "fa-mobile-screen",
+        "title": "Android Mobile Apps",
+        "body": "Native Kotlin apps that connect to your backend and work the way your team actually works — fast, offline-capable, no browser required."
+      },
+      {
+        "icon": "fa-globe",
+        "title": "Business Websites & CMS",
+        "body": "Professional websites your staff can update without calling a developer. SEO-ready, mobile-friendly, and actually maintained."
+      },
+      {
+        "icon": "fa-microchip",
+        "title": "IoT & Automation",
+        "body": "ESP32 and Raspberry Pi solutions for monitoring, control, and automation — sensor dashboards, MQTT pipelines, relay systems."
+      },
+      {
+        "icon": "fa-network-wired",
+        "title": "Network & Infrastructure",
+        "body": "Cisco switches and routers, Windows Server, Active Directory, VPN, CCTV, VMware virtualisation, structured cabling — designed to stay up."
+      }
+    ]
+  },
+  "why": {
+    "label": "Why NextLink MW",
+    "title_line1": "Not a Tech Company That Learned About Malawi.",
+    "title_line2": "The Other Way Around.",
+    "panel_heading": "Built Here. Works Here.",
+    "panel_body": "Most software sold in Malawi was built for somewhere else and retrofitted. NextLink MW builds for Malawian workflows, Malawian connectivity, and Malawian scale — from day one.",
+    "items": [
+      {
+        "icon": "fa-bolt",
+        "title": "5+ Years Managing Real Infrastructure",
+        "body": "Full IT operations for financial institutions in Malawi — not just consulting, actually running the systems day to day."
+      },
+      {
+        "icon": "fa-layer-group",
+        "title": "One Person. Full Stack. No Handoffs.",
+        "body": "From network cabling to the mobile app your staff uses. One point of contact, one person accountable for the whole thing."
+      },
+      {
+        "icon": "fa-shield-halved",
+        "title": "RBM-Compliant & Audit-Ready",
+        "body": "MUSCCO and MFI-Hub experience. Financial software built to meet Reserve Bank of Malawi data security requirements."
+      },
+      {
+        "icon": "fa-map",
+        "title": "Works in Rural Malawi. Not Just on Paper.",
+        "body": "Offline-first design, low-bandwidth optimisation, and support that doesn't require you to be in Lilongwe to get a response."
+      }
+    ]
+  },
+  "projects": {
+    "label": "Proof of Work",
+    "title": "Things We've Actually Shipped",
+    "subtext": "A selection of projects built, deployed, and being used by real people right now.",
+    "items": [
+      {
+        "emoji": "🌐",
+        "title": "Unique SACCO Platform",
+        "body": "Live SACCO website with member portal and floating CMS panel. Non-technical staff manage content without touching code. Real accounts. Real transactions.",
+        "tags": [
+          "PHP",
+          "JavaScript",
+          "CMS",
+          "Live"
+        ]
+      },
+      {
+        "emoji": "🏦",
+        "title": "Karonga Village Bank",
+        "body": "Full village banking system for Bank Mmuzi — member registration, savings accounts, loan tracking, and repayment schedules. Runs on a single machine, no internet required.",
+        "tags": [
+          "Python",
+          "SQLite",
+          "Offline-first"
+        ]
+      },
+      {
+        "emoji": "🏠",
+        "title": "Next Smart Home",
+        "body": "Home automation stack built on ESP32 — MQTT over TLS, real-time WebSocket dashboard, Android control app. Relay switching, PWM, and sensor monitoring from your phone.",
+        "tags": [
+          "ESP32",
+          "Laravel",
+          "Android",
+          "MQTT"
+        ]
+      },
+      {
+        "emoji": "🐧",
+        "title": "Nganjo OS",
+        "body": "Custom Arch Linux distribution — GNOME on Wayland, pre-configured for a developer workstation. Ships as a bootable ISO. Used daily as a primary OS.",
+        "tags": [
+          "Bash",
+          "Archiso",
+          "Linux"
+        ]
+      },
+      {
+        "emoji": "🤖",
+        "title": "Atarah Assistant",
+        "body": "AI assistant built from scratch — voice input, persistent memory, reasoning engine, and desktop system integration. Not a wrapper around someone else's API.",
+        "tags": [
+          "Python",
+          "AI",
+          "Voice",
+          "Local"
+        ]
+      },
+      {
+        "emoji": "⚽",
+        "title": "Bet Neural",
+        "body": "Football match outcome predictor — Poisson regression + ensemble ML trained on six years of match data across seven European leagues. Consistently outperforms pundit consensus.",
+        "tags": [
+          "Python",
+          "ML",
+          "Poisson",
+          "7 Leagues"
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "label": "Get In Touch",
+    "title": "Got a Project in Mind?",
+    "subtext": "Tell us what you're trying to build or fix. If it's doable, we'll tell you how. If it's not, we'll tell you that too.",
+    "btn_text": "Start a Conversation",
+    "items": [
+      {
+        "icon": "fa-envelope",
+        "label": "Email",
+        "text": "nehemiahnganjo@outlook.com",
+        "href": "mailto:nehemiahnganjo@outlook.com"
+      },
+      {
+        "icon": "fa-whatsapp fab",
+        "label": "WhatsApp",
+        "text": "+265 882 730 381",
+        "href": "https://wa.me/265882730381"
+      },
+      {
+        "icon": "fa-linkedin fab",
+        "label": "LinkedIn",
+        "text": "Nehemiah Ng'anjo",
+        "href": "https://linkedin.com/in/nehemiah-ng-anjo-773ba01b5"
+      },
+      {
+        "icon": "fa-map-marker-alt",
+        "label": "Based In",
+        "text": "Rumphi, Malawi 🇲🇼",
+        "href": "#"
+      }
+    ]
+  },
+  "footer": {
+    "text": "© 2026 NextLink MW · Custom IT Solutions, Malawi · Built by Nehemiah Ng'anjo"
+  }
+}
