@@ -4,7 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" id="meta-desc" content=""/>
+  <meta property="og:title"       id="og-title"       content="NextLink MW"/>
+  <meta property="og:description" id="og-desc"        content=""/>
+  <meta property="og:image"       id="og-image"       content=""/>
+  <meta property="og:type"        content="website"/>
   <title id="page-title">NextLink MW</title>
+  <link rel="icon" id="favicon" href=""/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
@@ -281,10 +286,38 @@
       .container  { padding: 0 16px; }
     }
   </style>
+  <style>
+    /* accent color override — set from content.json */
+    :root { --acc-blue: #4A7FE0; }
+    .service-card.hidden, .project-card.hidden { display: none; }
+    .project-card a.proj-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; font-size: 0.8rem; font-weight: 600;
+      color: var(--acc-blue); text-decoration: none;
+      transition: gap 150ms;
+    }
+    .project-card a.proj-link:hover { gap: 10px; }
+    .biz-hours {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-inset); box-shadow: var(--inset);
+      border-radius: 99px; padding: 6px 16px;
+      font-size: 0.78rem; color: var(--tx-2); margin-top: 16px;
+    }
+    .social-bar {
+      display: flex; justify-content: center; gap: 12px; margin-top: 28px;
+    }
+    .social-btn {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--bg-card); box-shadow: var(--raised);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--tx-2); text-decoration: none; font-size: 1rem;
+      transition: color var(--t-norm), box-shadow var(--t-norm), transform var(--t-norm);
+    }
+    .social-btn:hover { color: var(--acc-blue); transform: translateY(-2px); box-shadow: var(--raised-lg); }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a class="logo" href="#" id="nav-logo"></a>
   <ul class="nav-links">
@@ -299,7 +332,6 @@
   </div>
 </nav>
 
-<!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
     <div class="hero-badge" id="hero-badge"></div>
@@ -312,24 +344,21 @@
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats-bar">
   <div class="container">
     <div class="stats-grid" id="stats-grid"></div>
   </div>
 </div>
 
-<!-- SERVICES -->
 <section id="services">
   <div class="container">
-    <div class="label"    id="svc-label"></div>
+    <div class="label"         id="svc-label"></div>
     <div class="section-title" id="svc-title"></div>
-    <p class="section-sub"    id="svc-sub"></p>
+    <p class="section-sub"     id="svc-sub"></p>
     <div class="services-grid" id="services-grid"></div>
   </div>
 </section>
 
-<!-- WHY US -->
 <section id="why">
   <div class="container">
     <div class="label"         id="why-label"></div>
@@ -345,31 +374,195 @@
   </div>
 </section>
 
-<!-- PROJECTS -->
 <section id="projects">
   <div class="container">
     <div class="label"         id="proj-label"></div>
     <div class="section-title" id="proj-title"></div>
-    <p class="section-sub"    id="proj-sub"></p>
+    <p class="section-sub"     id="proj-sub"></p>
     <div class="projects-grid" id="projects-grid"></div>
   </div>
 </section>
 
-<!-- CONTACT -->
 <section id="contact">
   <div class="container">
     <div class="label"         id="ct-label"></div>
     <div class="section-title" id="ct-title"></div>
     <p class="section-sub" style="margin:0 auto;" id="ct-sub"></p>
     <div class="contact-grid"  id="contact-grid"></div>
-    <a class="btn-primary" id="ct-btn" href="mailto:nehemiahnganjo@outlook.com"></a>
+    <div id="biz-hours-wrap"></div>
+    <div id="social-bar-wrap"></div>
+    <div id="maps-wrap" style="margin-top:32px;"></div>
+    <a class="btn-primary" id="ct-btn" href="#" style="margin-top:32px;"></a>
   </div>
 </section>
 
 <footer><p id="footer-text"></p></footer>
 
 <script>
-// ── Theme toggle ────────────────────────────────────────────
+const REPO  = 'Nehemiahnganjo/nextlinkmw';
+const CACHE = 'nxlmw_v2';
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function render(c) {
+  // ── accent color
+  if (c.branding?.accent_color)
+    document.documentElement.style.setProperty('--acc-blue', c.branding.accent_color);
+
+  // ── default theme
+  const saved = localStorage.getItem('theme');
+  if (!saved && c.branding?.default_theme)
+    document.documentElement.setAttribute('data-theme', c.branding.default_theme);
+
+  // ── favicon / OG
+  if (c.branding?.favicon) document.getElementById('favicon').href = c.branding.favicon;
+  if (c.branding?.og_image) document.getElementById('og-image').content = c.branding.og_image;
+
+  // ── GA4
+  if (c.analytics?.enabled && c.analytics?.ga4_id) {
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${c.analytics.ga4_id}`;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', c.analytics.ga4_id);
+  }
+
+  // ── meta
+  document.title = c.site.title;
+  document.getElementById('meta-desc').content = c.site.description;
+  document.getElementById('og-title').content  = c.site.title;
+  document.getElementById('og-desc').content   = c.site.description;
+
+  // ── nav logo
+  const parts = c.site.logo.split('Link');
+  document.getElementById('nav-logo').innerHTML = '<span>' + esc(parts[0]) + '</span>Link' + esc(parts[1]||'');
+  const cta = document.getElementById('nav-cta');
+  cta.textContent = c.nav.cta_text; cta.href = c.nav.cta_href;
+
+  // ── hero
+  document.getElementById('hero-badge').innerHTML = '<i class="fas fa-map-marker-alt"></i> ' + esc(c.hero.badge);
+  document.getElementById('hero-heading').innerHTML = esc(c.hero.heading_line1) + '<br/><em>' + esc(c.hero.heading_line2) + '</em>';
+  document.getElementById('hero-sub').textContent = c.hero.subtext;
+  const bp = document.getElementById('hero-btn-primary');
+  bp.textContent = c.hero.btn_primary_text; bp.href = c.hero.btn_primary_href;
+  const bg = document.getElementById('hero-btn-ghost');
+  bg.textContent = c.hero.btn_ghost_text; bg.href = c.hero.btn_ghost_href;
+
+  // ── stats
+  document.getElementById('stats-grid').innerHTML = c.stats.map(s =>
+    `<div class="stat-tile"><div class="stat-num">${esc(s.number)}</div><div class="stat-lbl">${esc(s.label)}</div></div>`
+  ).join('');
+
+  // ── services (respect visible flag)
+  document.getElementById('svc-label').textContent = c.services.label;
+  document.getElementById('svc-title').innerHTML = esc(c.services.title_line1) + '<br/>' + esc(c.services.title_line2);
+  document.getElementById('svc-sub').textContent  = c.services.subtext;
+  document.getElementById('services-grid').innerHTML = c.services.items
+    .filter(s => s.visible !== false)
+    .map(s => `<div class="service-card">
+      <div class="svc-icon"><i class="fas ${esc(s.icon)}"></i></div>
+      <h3>${esc(s.title)}</h3><p>${esc(s.body)}</p>
+    </div>`).join('');
+
+  // ── why
+  document.getElementById('why-label').textContent = c.why.label;
+  document.getElementById('why-title').innerHTML = esc(c.why.title_line1) + '<br/>' + esc(c.why.title_line2);
+  document.getElementById('why-panel-h').textContent = c.why.panel_heading;
+  document.getElementById('why-panel-p').textContent = c.why.panel_body;
+  document.getElementById('why-list').innerHTML = c.why.items.map(w =>
+    `<div class="why-item">
+      <div class="why-dot"><i class="fas ${esc(w.icon)}"></i></div>
+      <div><h4>${esc(w.title)}</h4><p>${esc(w.body)}</p></div>
+    </div>`).join('');
+
+  // ── projects (visible + optional link)
+  document.getElementById('proj-label').textContent = c.projects.label;
+  document.getElementById('proj-title').textContent = c.projects.title;
+  document.getElementById('proj-sub').textContent   = c.projects.subtext;
+  document.getElementById('projects-grid').innerHTML = c.projects.items
+    .filter(p => p.visible !== false)
+    .map(p => `<div class="project-card">
+      <h3>${esc(p.emoji)} ${esc(p.title)}</h3>
+      <p>${esc(p.body)}</p>
+      <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      ${p.link ? `<a class="proj-link" href="${esc(p.link)}" target="_blank">View Project <i class="fas fa-arrow-up-right-from-square"></i></a>` : ''}
+    </div>`).join('');
+
+  // ── contact
+  document.getElementById('ct-label').textContent = c.contact.label;
+  document.getElementById('ct-title').textContent = c.contact.title;
+  document.getElementById('ct-sub').textContent   = c.contact.subtext;
+  const ctBtn = document.getElementById('ct-btn');
+  ctBtn.textContent = c.contact.btn_text;
+  // WhatsApp prefill on primary CTA if first contact is WA
+  const waNum = c.social?.whatsapp_number;
+  const waMsg = c.social?.whatsapp_prefill || '';
+  ctBtn.href = waNum
+    ? `https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`
+    : (c.contact.items[0]?.href || '#');
+
+  document.getElementById('contact-grid').innerHTML = c.contact.items.map(i => {
+    const iconClass = i.icon.includes('fab') ? i.icon : 'fas ' + i.icon;
+    return `<div class="contact-card">
+      <div class="contact-icon"><i class="${esc(iconClass)}"></i></div>
+      <p>${esc(i.label)}</p>
+      <a href="${esc(i.href)}" ${i.href.startsWith('http')||i.href.startsWith('https://wa')?'target="_blank"':''}>${esc(i.text)}</a>
+    </div>`;
+  }).join('');
+
+  // business hours
+  if (c.contact.business_hours) {
+    document.getElementById('biz-hours-wrap').innerHTML =
+      `<div class="biz-hours"><i class="fas fa-clock"></i> ${esc(c.contact.business_hours)}</div>`;
+  }
+
+  // social bar
+  const soc = c.social || {};
+  const socLinks = [
+    { key:'facebook',  icon:'fab fa-facebook',  label:'Facebook' },
+    { key:'twitter',   icon:'fab fa-x-twitter', label:'X/Twitter' },
+    { key:'linkedin',  icon:'fab fa-linkedin',  label:'LinkedIn' },
+    { key:'github',    icon:'fab fa-github',    label:'GitHub' },
+  ].filter(s => soc[s.key]);
+  if (socLinks.length) {
+    document.getElementById('social-bar-wrap').innerHTML =
+      `<div class="social-bar">${socLinks.map(s =>
+        `<a class="social-btn" href="${esc(soc[s.key])}" target="_blank" aria-label="${s.label}">
+          <i class="${s.icon}"></i></a>`
+      ).join('')}</div>`;
+  }
+
+  // maps embed
+  if (c.contact.maps_embed) {
+    document.getElementById('maps-wrap').innerHTML =
+      `<div style="border-radius:20px;overflow:hidden;box-shadow:var(--raised);">
+        <iframe src="${esc(c.contact.maps_embed)}" width="100%" height="280"
+          style="border:0;display:block;" allowfullscreen loading="lazy"></iframe>
+      </div>`;
+  }
+
+  // footer
+  document.getElementById('footer-text').innerHTML =
+    c.footer.text.replace('NextLink MW','<span>NextLink MW</span>');
+
+  // scroll observer
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, {threshold:0.4});
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+}
+
+// theme toggle
 const btn  = document.getElementById('theme-btn');
 const root = document.documentElement;
 const icon = btn.querySelector('i');
@@ -383,130 +576,11 @@ btn.addEventListener('click', () => {
   icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 });
 
-// ── Active nav on scroll ────────────────────────────────────
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-      const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-      if (a) a.classList.add('active');
-    }
-  });
-}, { threshold: 0.4 });
-
-// ── Render from content.json ────────────────────────────────
-const REPO  = 'Nehemiahnganjo/nextlinkmw';
-const CACHE = 'nxlmw_content_v1';
-
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function render(c) {
-  // meta / title
-  document.title = c.site.title;
-  document.getElementById('meta-desc').content = c.site.description;
-
-  // nav
-  document.getElementById('nav-logo').innerHTML =
-    '<span>' + esc(c.site.logo.replace('Link',' </span>Link')) ;
-  // rebuild logo properly
-  const logoEl = document.getElementById('nav-logo');
-  const parts  = c.site.logo.split('Link');
-  logoEl.innerHTML = '<span>' + esc(parts[0]) + '</span>Link' + esc(parts[1] || '');
-
-  const cta = document.getElementById('nav-cta');
-  cta.textContent = c.nav.cta_text;
-  cta.href = c.nav.cta_href;
-
-  // hero
-  const hb = document.getElementById('hero-badge');
-  hb.innerHTML = '<i class="fas fa-map-marker-alt"></i> ' + esc(c.hero.badge);
-  document.getElementById('hero-heading').innerHTML =
-    esc(c.hero.heading_line1) + '<br/><em>' + esc(c.hero.heading_line2) + '</em>';
-  document.getElementById('hero-sub').textContent = c.hero.subtext;
-  const bp = document.getElementById('hero-btn-primary');
-  bp.textContent = c.hero.btn_primary_text; bp.href = c.hero.btn_primary_href;
-  const bg = document.getElementById('hero-btn-ghost');
-  bg.textContent = c.hero.btn_ghost_text;   bg.href = c.hero.btn_ghost_href;
-
-  // stats
-  document.getElementById('stats-grid').innerHTML = c.stats.map(s =>
-    `<div class="stat-tile"><div class="stat-num">${esc(s.number)}</div><div class="stat-lbl">${esc(s.label)}</div></div>`
-  ).join('');
-
-  // services
-  document.getElementById('svc-label').textContent = c.services.label;
-  document.getElementById('svc-title').innerHTML =
-    esc(c.services.title_line1) + '<br/>' + esc(c.services.title_line2);
-  document.getElementById('svc-sub').textContent = c.services.subtext;
-  document.getElementById('services-grid').innerHTML = c.services.items.map(s =>
-    `<div class="service-card">
-      <div class="svc-icon"><i class="fas ${esc(s.icon)}"></i></div>
-      <h3>${esc(s.title)}</h3>
-      <p>${esc(s.body)}</p>
-    </div>`
-  ).join('');
-
-  // why
-  document.getElementById('why-label').textContent = c.why.label;
-  document.getElementById('why-title').innerHTML =
-    esc(c.why.title_line1) + '<br/>' + esc(c.why.title_line2);
-  document.getElementById('why-panel-h').textContent = c.why.panel_heading;
-  document.getElementById('why-panel-p').textContent = c.why.panel_body;
-  document.getElementById('why-list').innerHTML = c.why.items.map(w =>
-    `<div class="why-item">
-      <div class="why-dot"><i class="fas ${esc(w.icon)}"></i></div>
-      <div><h4>${esc(w.title)}</h4><p>${esc(w.body)}</p></div>
-    </div>`
-  ).join('');
-
-  // projects
-  document.getElementById('proj-label').textContent = c.projects.label;
-  document.getElementById('proj-title').textContent = c.projects.title;
-  document.getElementById('proj-sub').textContent   = c.projects.subtext;
-  document.getElementById('projects-grid').innerHTML = c.projects.items.map(p =>
-    `<div class="project-card">
-      <h3>${esc(p.emoji)} ${esc(p.title)}</h3>
-      <p>${esc(p.body)}</p>
-      <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
-    </div>`
-  ).join('');
-
-  // contact
-  document.getElementById('ct-label').textContent = c.contact.label;
-  document.getElementById('ct-title').textContent = c.contact.title;
-  document.getElementById('ct-sub').textContent   = c.contact.subtext;
-  const ctBtn = document.getElementById('ct-btn');
-  ctBtn.textContent = c.contact.btn_text;
-  ctBtn.href = c.contact.items[0].href;
-  document.getElementById('contact-grid').innerHTML = c.contact.items.map(i => {
-    const iconClass = i.icon.includes('fab') ? i.icon : 'fas ' + i.icon;
-    return `<div class="contact-card">
-      <div class="contact-icon"><i class="${esc(iconClass)}"></i></div>
-      <p>${esc(i.label)}</p>
-      <a href="${esc(i.href)}" ${i.href.startsWith('http') ? 'target="_blank"' : ''}>${esc(i.text)}</a>
-    </div>`;
-  }).join('');
-
-  // footer
-  document.getElementById('footer-text').innerHTML = c.footer.text
-    .replace('NextLink MW', '<span>NextLink MW</span>');
-
-  // start scroll observer after render
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-}
-
-// fetch with cache-bust for freshness
+// fetch content
 fetch(`https://raw.githubusercontent.com/${REPO}/main/content.json?_=${Date.now()}`)
   .then(r => r.json())
   .then(c => { sessionStorage.setItem(CACHE, JSON.stringify(c)); render(c); })
-  .catch(() => {
-    const cached = sessionStorage.getItem(CACHE);
-    if (cached) render(JSON.parse(cached));
-  });
+  .catch(() => { const c = sessionStorage.getItem(CACHE); if (c) render(JSON.parse(c)); });
 </script>
 </body>
 </html>
