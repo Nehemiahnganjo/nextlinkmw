@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NextLink MW — CMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #1C2126; --card: #21262C; --inset: #171B1F;
+      --tx-1:  #E8ECF0; --tx-2: #9AA5B1; --tx-3: #626C77;
+      --blue:  #6B9BFF; --green: #5FD37D; --red: #F2695E;
+      --sh-l:  rgba(255,255,255,0.04); --sh-d: rgba(0,0,0,0.55);
+      --raised:    -6px -6px 14px var(--sh-l),  6px  6px 14px var(--sh-d);
+      --raised-lg: -10px -10px 24px var(--sh-l), 10px 10px 24px var(--sh-d);
+      --inset-sh:  inset -4px -4px 10px var(--sh-l), inset 4px 4px 10px var(--sh-d);
+      --r: 14px; --r-lg: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--tx-1); min-height: 100vh; }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .login-box {
+      background: var(--card); border-radius: var(--r-lg); box-shadow: var(--raised-lg);
+      padding: 48px 40px; width: 100%; max-width: 400px; text-align: center;
+    }
+    .login-box .dial {
+      width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 24px;
+      background: var(--card); box-shadow: var(--raised-lg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .login-box .dial .inner {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--inset); box-shadow: var(--inset-sh);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: var(--blue);
+    }
+    .login-box h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+    .login-box p  { font-size: 0.82rem; color: var(--tx-2); margin-bottom: 28px; }
+    .field { margin-bottom: 16px; text-align: left; }
+    .field label { font-size: 0.75rem; font-weight: 600; color: var(--tx-3); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .field input {
+      width: 100%; padding: 12px 16px; border: none; outline: none;
+      background: var(--inset); box-shadow: var(--inset-sh);
+      border-radius: var(--r); color: var(--tx-1); font-family: inherit; font-size: 0.9rem;
+    }
+    .field input::placeholder { color: var(--tx-3); }
+    .btn {
+      width: 100%; padding: 13px; border: none; cursor: pointer;
+      background: var(--blue); color: #fff; border-radius: var(--r);
+      font-family: inherit; font-size: 0.9rem; font-weight: 600;
+      box-shadow: var(--raised); transition: transform 100ms, box-shadow 100ms;
+    }
+    .btn:hover  { transform: translateY(-1px); }
+    .btn:active { box-shadow: var(--inset-sh); transform: translateY(0); }
+    .btn.danger { background: var(--red); }
+    .btn.success { background: var(--green); color: #1C2126; }
+    #login-err { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
+
+    /* ── APP SHELL ── */
+    #app { display: none; }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--card); box-shadow: var(--raised-lg);
+      padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .topbar .logo { font-size: 1.1rem; font-weight: 800; }
+    .topbar .logo span { color: var(--blue); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .save-btn {
+      padding: 9px 22px; border: none; cursor: pointer;
+      background: var(--blue); color: #fff; border-radius: var(--r);
+      font-family: inherit; font-size: 0.82rem; font-weight: 600;
+      box-shadow: var(--raised); transition: transform 100ms, box-shadow 100ms;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .save-btn:hover  { transform: translateY(-1px); }
+    .save-btn:active { box-shadow: var(--inset-sh); transform: none; }
+    .save-btn.saving { background: var(--tx-3); cursor: wait; }
+    .save-btn.saved  { background: var(--green); color: #1C2126; }
+    .logout-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--card); box-shadow: var(--raised);
+      color: var(--tx-2); font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 150ms;
+    }
+    .logout-btn:hover { color: var(--red); }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 64px); }
+    .sidebar {
+      width: 220px; flex-shrink: 0; padding: 24px 16px;
+      border-right: 1px solid rgba(255,255,255,0.04);
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--r); cursor: pointer;
+      font-size: 0.84rem; font-weight: 500; color: var(--tx-2);
+      transition: background 150ms, color 150ms, box-shadow 150ms;
+      margin-bottom: 4px;
+    }
+    .sidebar-item i { width: 16px; text-align: center; font-size: 0.8rem; }
+    .sidebar-item:hover { color: var(--tx-1); background: var(--inset); }
+    .sidebar-item.active {
+      color: var(--blue); background: var(--inset); box-shadow: var(--inset-sh);
+    }
+    .sidebar-section {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--tx-3);
+      padding: 16px 14px 6px;
+    }
+    .preview-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: var(--r);
+      font-size: 0.8rem; color: var(--tx-3); text-decoration: none;
+      transition: color 150ms;
+    }
+    .preview-link:hover { color: var(--blue); }
+
+    /* ── PANELS ── */
+    .main { flex: 1; padding: 32px; overflow-y: auto; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .panel-sub   { font-size: 0.82rem; color: var(--tx-2); margin-bottom: 28px; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--tx-3); margin-bottom: 7px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 11px 16px; border: none; outline: none;
+      background: var(--inset); box-shadow: var(--inset-sh);
+      border-radius: var(--r); color: var(--tx-1);
+      font-family: inherit; font-size: 0.88rem; resize: vertical;
+      transition: box-shadow 150ms;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      box-shadow: var(--inset-sh), 0 0 0 2px var(--blue);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-card {
+      background: var(--card); border-radius: var(--r-lg); box-shadow: var(--raised);
+      padding: 24px; margin-bottom: 16px;
+    }
+    .form-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px; cursor: pointer;
+    }
+    .form-card-header h3 { font-size: 0.9rem; font-weight: 700; }
+    .form-card-header .toggle-icon { color: var(--tx-3); font-size: 0.8rem; transition: transform 200ms; }
+    .form-card-body { overflow: hidden; transition: max-height 300ms ease; }
+
+    /* repeater */
+    .repeater-item {
+      background: var(--inset); box-shadow: var(--inset-sh);
+      border-radius: var(--r); padding: 18px; margin-bottom: 12px; position: relative;
+    }
+    .repeater-item .item-num {
+      font-size: 0.7rem; font-weight: 700; color: var(--tx-3);
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .repeater-item .del-btn {
+      position: absolute; top: 12px; right: 12px;
+      width: 28px; height: 28px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--card); box-shadow: var(--raised);
+      color: var(--tx-3); font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 150ms;
+    }
+    .repeater-item .del-btn:hover { color: var(--red); }
+    .add-btn {
+      padding: 9px 18px; border: none; cursor: pointer;
+      background: var(--card); color: var(--blue);
+      border-radius: var(--r); font-family: inherit; font-size: 0.82rem; font-weight: 600;
+      box-shadow: var(--raised); display: flex; align-items: center; gap: 8px;
+      transition: transform 100ms, box-shadow 100ms;
+    }
+    .add-btn:hover  { transform: translateY(-1px); }
+    .add-btn:active { box-shadow: var(--inset-sh); transform: none; }
+
+    /* tags input */
+    .tags-input { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      padding: 8px 12px; background: var(--inset); box-shadow: var(--inset-sh);
+      border-radius: var(--r); min-height: 44px; cursor: text; }
+    .tags-input .tag-chip {
+      background: var(--card); box-shadow: var(--raised);
+      border-radius: 99px; padding: 3px 10px 3px 12px;
+      font-size: 0.75rem; font-weight: 600; color: var(--blue);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tags-input .tag-chip button {
+      background: none; border: none; cursor: pointer; color: var(--tx-3);
+      padding: 0; font-size: 0.7rem; line-height: 1;
+    }
+    .tags-input .tag-chip button:hover { color: var(--red); }
+    .tags-input input {
+      border: none; outline: none; background: transparent;
+      color: var(--tx-1); font-family: inherit; font-size: 0.84rem;
+      min-width: 80px; flex: 1; padding: 2px 4px; box-shadow: none !important;
+    }
+
+    /* toast */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--card); box-shadow: var(--raised-lg);
+      border-radius: var(--r); padding: 14px 20px;
+      font-size: 0.85rem; font-weight: 500; color: var(--tx-1);
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(80px); opacity: 0;
+      transition: transform 300ms, opacity 300ms;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast .ti { font-size: 1rem; }
+    #toast.ok  .ti { color: var(--green); }
+    #toast.err .ti { color: var(--red); }
+
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .topbar { padding: 12px 16px; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="dial"><div class="inner"><i class="fas fa-lock"></i></div></div>
+    <h2>NextLink CMS</h2>
+    <p>Enter your GitHub Personal Access Token to continue.</p>
+    <div class="field">
+      <label>GitHub Token</label>
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxx" autocomplete="off"/>
+    </div>
+    <button class="btn" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> &nbsp; Sign In</button>
+    <div id="login-err"><i class="fas fa-circle-exclamation"></i> Invalid token or no access to repo.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo"><span>Next</span>Link CMS</div>
+    <div class="topbar-right">
+      <button class="save-btn" id="save-btn" onclick="saveContent()">
+        <i class="fas fa-floppy-disk"></i> Save Changes
+      </button>
+      <button class="logout-btn" onclick="doLogout()" title="Sign out"><i class="fas fa-right-from-bracket"></i></button>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">Content</div>
+      <div class="sidebar-item active" onclick="showPanel('hero')"    data-panel="hero">    <i class="fas fa-house"></i> Hero</div>
+      <div class="sidebar-item"        onclick="showPanel('stats')"   data-panel="stats">   <i class="fas fa-chart-bar"></i> Stats</div>
+      <div class="sidebar-item"        onclick="showPanel('services')" data-panel="services"><i class="fas fa-wrench"></i> Services</div>
+      <div class="sidebar-item"        onclick="showPanel('why')"     data-panel="why">     <i class="fas fa-medal"></i> Why Us</div>
+      <div class="sidebar-item"        onclick="showPanel('projects')" data-panel="projects"><i class="fas fa-rocket"></i> Projects</div>
+      <div class="sidebar-item"        onclick="showPanel('contact')" data-panel="contact"> <i class="fas fa-envelope"></i> Contact</div>
+      <div class="sidebar-section">Site</div>
+      <div class="sidebar-item"        onclick="showPanel('site')"    data-panel="site">    <i class="fas fa-gear"></i> Settings</div>
+      <div class="sidebar-section">Links</div>
+      <a class="preview-link" href="https://nehemiahnganjo.github.io/nextlinkmw/" target="_blank">
+        <i class="fas fa-arrow-up-right-from-square"></i> View Live Site
+      </a>
+    </aside>
+    <main class="main" id="main-content"></main>
+  </div>
+</div>
+
+<div id="toast"><i class="fas fa-check-circle ti"></i> <span id="toast-msg"></span></div>
+
+<script>
+const REPO   = 'Nehemiahnganjo/nextlinkmw';
+const FILE   = 'content.json';
+const RAW    = `https://raw.githubusercontent.com/${REPO}/main/${FILE}`;
+const API    = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+let TOKEN = '', content = {}, fileSHA = '';
+
+// ── AUTH ────────────────────────────────────────────────────
+function doLogin() {
+  const t = document.getElementById('token-input').value.trim();
+  if (!t) return;
+  fetch(API, { headers: { Authorization: 'token ' + t } })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => {
+      TOKEN   = t;
+      fileSHA = d.sha;
+      content = JSON.parse(atob(d.content.replace(/\n/g,'')));
+      localStorage.setItem('cms_token', t);
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      buildAllPanels();
+      showPanel('hero');
+    })
+    .catch(() => {
+      document.getElementById('login-err').style.display = 'block';
+    });
+}
+document.getElementById('token-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+// auto-login if token stored
+const stored = localStorage.getItem('cms_token');
+if (stored) { document.getElementById('token-input').value = stored; doLogin(); }
+
+function doLogout() {
+  localStorage.removeItem('cms_token');
+  TOKEN = ''; content = {}; fileSHA = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('token-input').value = '';
+}
+
+// ── NAV ────────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  const p = document.getElementById('panel-' + name);
+  if (p) p.classList.add('active');
+  const si = document.querySelector(`.sidebar-item[data-panel="${name}"]`);
+  if (si) si.classList.add('active');
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function toast(msg, ok = true) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'show ' + (ok ? 'ok' : 'err');
+  t.querySelector('.ti').className = 'ti fas ' + (ok ? 'fa-check-circle' : 'fa-circle-exclamation');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── HELPERS ────────────────────────────────────────────────
+function field(label, val, path, type='input', rows=2) {
+  const tag = type === 'textarea' ? `<textarea rows="${rows}" data-path="${path}">${esc(val)}</textarea>`
+                                  : `<input type="text" value="${esc(val)}" data-path="${path}"/>`;
+  return `<div class="form-group"><label>${label}</label>${tag}</div>`;
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function readFields(el) {
+  el.querySelectorAll('[data-path]').forEach(inp => {
+    const path = inp.dataset.path.split('.');
+    let obj = content;
+    for (let i = 0; i < path.length - 1; i++) {
+      if (path[i].match(/^\d+$/)) obj = obj[+path[i]];
+      else obj = obj[path[i]];
+    }
+    const last = path[path.length - 1];
+    obj[last] = inp.value;
+  });
+}
+
+// ── TAGS WIDGET ────────────────────────────────────────────
+function tagsWidget(tags, pathPrefix) {
+  const id = 'tags_' + Math.random().toString(36).slice(2);
+  setTimeout(() => initTagsWidget(id, tags, pathPrefix), 0);
+  return `<div class="form-group"><label>Tags</label><div class="tags-input" id="${id}" data-tags-path="${pathPrefix}"></div></div>`;
+}
+function initTagsWidget(id, tags, pathPrefix) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let current = [...tags];
+  function render() {
+    el.innerHTML = current.map((t,i) =>
+      `<span class="tag-chip">${esc(t)}<button onclick="removeTag('${id}',${i})">×</button></span>`
+    ).join('') + `<input placeholder="Add tag, press Enter" onkeydown="addTag(event,'${id}')"/>`;
+    // sync to content
+    const parts = pathPrefix.split('.');
+    let obj = content;
+    for (let i = 0; i < parts.length - 1; i++) obj = isNaN(parts[i]) ? obj[parts[i]] : obj[+parts[i]];
+    obj[parts[parts.length-1]] = current;
+  }
+  el._tags = current;
+  el._render = render;
+  render();
+}
+function addTag(e, id) {
+  if (e.key !== 'Enter' && e.key !== ',') return;
+  e.preventDefault();
+  const el = document.getElementById(id);
+  const val = e.target.value.trim().replace(/,$/,'');
+  if (val && !el._tags.includes(val)) { el._tags.push(val); el._render(); }
+  e.target.value = '';
+}
+function removeTag(id, idx) {
+  const el = document.getElementById(id);
+  el._tags.splice(idx,1); el._render();
+}
+
+// ── COLLAPSIBLE CARD ───────────────────────────────────────
+function card(title, bodyHtml, open=true) {
+  const id = 'fc_' + Math.random().toString(36).slice(2);
+  setTimeout(() => {
+    const b = document.getElementById(id);
+    if (b) b.style.maxHeight = open ? b.scrollHeight + 'px' : '0';
+  }, 0);
+  return `<div class="form-card">
+    <div class="form-card-header" onclick="toggleCard('${id}')">
+      <h3>${title}</h3>
+      <i class="fas fa-chevron-${open?'up':'down'} toggle-icon" id="ic_${id}"></i>
+    </div>
+    <div class="form-card-body" id="${id}">${bodyHtml}</div>
+  </div>`;
+}
+function toggleCard(id) {
+  const b = document.getElementById(id);
+  const ic = document.getElementById('ic_'+id);
+  if (b.style.maxHeight && b.style.maxHeight !== '0px') {
+    b.style.maxHeight = '0'; ic.className = 'fas fa-chevron-down toggle-icon';
+  } else {
+    b.style.maxHeight = b.scrollHeight + 5000 + 'px'; ic.className = 'fas fa-chevron-up toggle-icon';
+  }
+}
+
+// ── BUILD PANELS ───────────────────────────────────────────
+function buildAllPanels() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = [
+    buildHero(), buildStats(), buildServices(),
+    buildWhy(), buildProjects(), buildContact(), buildSite()
+  ].join('');
+}
+
+function buildHero() {
+  const h = content.hero; const n = content.nav;
+  return `<div class="panel" id="panel-hero">
+    <div class="panel-title">Hero Section</div>
+    <div class="panel-sub">The first thing visitors see.</div>
+    ${card('Badge & Headline',
+      field('Badge Text', h.badge, 'hero.badge') +
+      field('Heading Line 1', h.heading_line1, 'hero.heading_line1') +
+      field('Heading Line 2 (accent)', h.heading_line2, 'hero.heading_line2')
+    )}
+    ${card('Body & Buttons',
+      field('Subtext', h.subtext, 'hero.subtext', 'textarea', 3) +
+      `<div class="form-row">` +
+        field('Primary Button Text', h.btn_primary_text, 'hero.btn_primary_text') +
+        field('Primary Button Link', h.btn_primary_href, 'hero.btn_primary_href') +
+      `</div><div class="form-row">` +
+        field('Ghost Button Text', h.btn_ghost_text, 'hero.btn_ghost_text') +
+        field('Ghost Button Link', h.btn_ghost_href, 'hero.btn_ghost_href') +
+      `</div>`
+    )}
+    ${card('Nav CTA',
+      `<div class="form-row">` +
+        field('CTA Button Text', n.cta_text, 'nav.cta_text') +
+        field('CTA Button Link', n.cta_href, 'nav.cta_href') +
+      `</div>`
+    , false)}
+  </div>`;
+}
+
+function buildStats() {
+  const stats = content.stats;
+  const items = stats.map((s,i) =>
+    `<div class="repeater-item">
+      <div class="item-num">Stat ${i+1}</div>
+      <button class="del-btn" onclick="delStat(${i})"><i class="fas fa-times"></i></button>
+      <div class="form-row">
+        ${field('Number / Value', s.number, `stats.${i}.number`)}
+        ${field('Label', s.label, `stats.${i}.label`)}
+      </div>
+    </div>`
+  ).join('');
+  return `<div class="panel" id="panel-stats">
+    <div class="panel-title">Stats Bar</div>
+    <div class="panel-sub">The four numbers below the hero.</div>
+    <div class="form-card">
+      <div id="stats-list">${items}</div>
+      <button class="add-btn" onclick="addStat()"><i class="fas fa-plus"></i> Add Stat</button>
+    </div>
+  </div>`;
+}
+
+function buildServices() {
+  const s = content.services;
+  const items = s.items.map((sv,i) =>
+    `<div class="repeater-item">
+      <div class="item-num">Service ${i+1}</div>
+      <button class="del-btn" onclick="delService(${i})"><i class="fas fa-times"></i></button>
+      ${field('Title', sv.title, `services.items.${i}.title`)}
+      ${field('Icon (FontAwesome class)', sv.icon, `services.items.${i}.icon`)}
+      ${field('Body', sv.body, `services.items.${i}.body`, 'textarea', 2)}
+    </div>`
+  ).join('');
+  return `<div class="panel" id="panel-services">
+    <div class="panel-title">Services</div>
+    <div class="panel-sub">Edit service cards. Icon = FontAwesome class e.g. fa-cash-register</div>
+    ${card('Section Header',
+      field('Label', s.label, 'services.label') +
+      field('Title Line 1', s.title_line1, 'services.title_line1') +
+      field('Title Line 2', s.title_line2, 'services.title_line2') +
+      field('Subtext', s.subtext, 'services.subtext', 'textarea', 2)
+    , false)}
+    <div class="form-card">
+      <div id="services-list">${items}</div>
+      <button class="add-btn" onclick="addService()"><i class="fas fa-plus"></i> Add Service</button>
+    </div>
+  </div>`;
+}
+
+function buildWhy() {
+  const w = content.why;
+  const items = w.items.map((wi,i) =>
+    `<div class="repeater-item">
+      <div class="item-num">Point ${i+1}</div>
+      <button class="del-btn" onclick="delWhy(${i})"><i class="fas fa-times"></i></button>
+      ${field('Title', wi.title, `why.items.${i}.title`)}
+      ${field('Icon (FontAwesome class)', wi.icon, `why.items.${i}.icon`)}
+      ${field('Body', wi.body, `why.items.${i}.body`, 'textarea', 2)}
+    </div>`
+  ).join('');
+  return `<div class="panel" id="panel-why">
+    <div class="panel-title">Why Us</div>
+    <div class="panel-sub">The trust-building section with the dial panel.</div>
+    ${card('Section Header',
+      field('Label', w.label, 'why.label') +
+      field('Title Line 1', w.title_line1, 'why.title_line1') +
+      field('Title Line 2', w.title_line2, 'why.title_line2')
+    , false)}
+    ${card('Panel (right side)',
+      field('Panel Heading', w.panel_heading, 'why.panel_heading') +
+      field('Panel Body', w.panel_body, 'why.panel_body', 'textarea', 3)
+    , false)}
+    <div class="form-card">
+      <div id="why-list">${items}</div>
+      <button class="add-btn" onclick="addWhy()"><i class="fas fa-plus"></i> Add Point</button>
+    </div>
+  </div>`;
+}
+
+function buildProjects() {
+  const p = content.projects;
+  const items = p.items.map((pi,i) =>
+    `<div class="repeater-item">
+      <div class="item-num">Project ${i+1}</div>
+      <button class="del-btn" onclick="delProject(${i})"><i class="fas fa-times"></i></button>
+      <div class="form-row">
+        ${field('Emoji', pi.emoji, `projects.items.${i}.emoji`)}
+        ${field('Title', pi.title, `projects.items.${i}.title`)}
+      </div>
+      ${field('Description', pi.body, `projects.items.${i}.body`, 'textarea', 3)}
+      ${tagsWidget(pi.tags, `projects.items.${i}.tags`)}
+    </div>`
+  ).join('');
+  return `<div class="panel" id="panel-projects">
+    <div class="panel-title">Projects</div>
+    <div class="panel-sub">Showcase cards. Add tags by typing and pressing Enter.</div>
+    ${card('Section Header',
+      field('Label', p.label, 'projects.label') +
+      field('Title', p.title, 'projects.title') +
+      field('Subtext', p.subtext, 'projects.subtext', 'textarea', 2)
+    , false)}
+    <div class="form-card">
+      <div id="projects-list">${items}</div>
+      <button class="add-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button>
+    </div>
+  </div>`;
+}
+
+function buildContact() {
+  const c = content.contact;
+  const items = c.items.map((ci,i) =>
+    `<div class="repeater-item">
+      <div class="item-num">Contact ${i+1}</div>
+      <button class="del-btn" onclick="delContact(${i})"><i class="fas fa-times"></i></button>
+      <div class="form-row">
+        ${field('Label', ci.label, `contact.items.${i}.label`)}
+        ${field('Icon class', ci.icon, `contact.items.${i}.icon`)}
+      </div>
+      <div class="form-row">
+        ${field('Display Text', ci.text, `contact.items.${i}.text`)}
+        ${field('Link (href)', ci.href, `contact.items.${i}.href`)}
+      </div>
+    </div>`
+  ).join('');
+  return `<div class="panel" id="panel-contact">
+    <div class="panel-title">Contact Section</div>
+    <div class="panel-sub">Contact cards and CTA button.</div>
+    ${card('Section Header',
+      field('Label', c.label, 'contact.label') +
+      field('Title', c.title, 'contact.title') +
+      field('Subtext', c.subtext, 'contact.subtext', 'textarea', 2) +
+      field('Button Text', c.btn_text, 'contact.btn_text')
+    )}
+    <div class="form-card">
+      <div id="contact-list">${items}</div>
+      <button class="add-btn" onclick="addContact()"><i class="fas fa-plus"></i> Add Contact</button>
+    </div>
+  </div>`;
+}
+
+function buildSite() {
+  const s = content.site; const f = content.footer;
+  return `<div class="panel" id="panel-site">
+    <div class="panel-title">Site Settings</div>
+    <div class="panel-sub">Global meta and footer.</div>
+    ${card('Identity',
+      field('Site Title (browser tab)', s.title, 'site.title') +
+      field('Meta Description (SEO)', s.description, 'site.description', 'textarea', 2) +
+      field('Logo Text', s.logo, 'site.logo')
+    )}
+    ${card('Footer',
+      field('Footer Text', f.text, 'footer.text')
+    , false)}
+  </div>`;
+}
+
+// ── REPEATER ACTIONS ───────────────────────────────────────
+function delStat(i)    { content.stats.splice(i,1);           rebuildPanel('stats'); }
+function delService(i) { content.services.items.splice(i,1);  rebuildPanel('services'); }
+function delWhy(i)     { content.why.items.splice(i,1);       rebuildPanel('why'); }
+function delProject(i) { content.projects.items.splice(i,1);  rebuildPanel('projects'); }
+function delContact(i) { content.contact.items.splice(i,1);   rebuildPanel('contact'); }
+
+function addStat()    { content.stats.push({number:'0',label:'New Stat'}); rebuildPanel('stats'); }
+function addService() { content.services.items.push({icon:'fa-star',title:'New Service',body:'Description.'}); rebuildPanel('services'); }
+function addWhy()     { content.why.items.push({icon:'fa-check',title:'New Point',body:'Details.'}); rebuildPanel('why'); }
+function addProject() { content.projects.items.push({emoji:'🚀',title:'New Project',body:'Description.',tags:[]}); rebuildPanel('projects'); }
+function addContact() { content.contact.items.push({icon:'fa-phone',label:'Phone',text:'+265 xxx xxx',href:'tel:+265xxx'}); rebuildPanel('contact'); }
+
+function rebuildPanel(name) {
+  // flush current input values before rebuilding
+  flushInputs();
+  const builders = { hero:buildHero, stats:buildStats, services:buildServices,
+                     why:buildWhy, projects:buildProjects, contact:buildContact, site:buildSite };
+  const panel = document.getElementById('panel-' + name);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = builders[name]();
+  const newPanel = tmp.querySelector('.panel');
+  panel.replaceWith(newPanel);
+  showPanel(name);
+}
+
+// ── FLUSH all live inputs into content before save ─────────
+function flushInputs() {
+  document.querySelectorAll('[data-path]').forEach(inp => {
+    const path = inp.dataset.path.split('.');
+    let obj = content;
+    for (let i = 0; i < path.length - 1; i++)
+      obj = isNaN(path[i]) ? obj[path[i]] : obj[+path[i]];
+    const last = path[path.length-1];
+    if (isNaN(last)) obj[last] = inp.value;
+    else obj[+last] = inp.value;
+  });
+  // tags widgets sync themselves live, no extra flush needed
+}
+
+// ── SAVE TO GITHUB ─────────────────────────────────────────
+async function saveContent() {
+  flushInputs();
+  const saveBtn = document.getElementById('save-btn');
+  saveBtn.className = 'save-btn saving';
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+  try {
+    // get latest SHA
+    const metaResp = await fetch(API, { headers: { Authorization: 'token ' + TOKEN } });
+    const meta = await metaResp.json();
+    fileSHA = meta.sha;
+
+    const body = JSON.stringify({
+      message: 'CMS update via admin panel',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+      sha: fileSHA
+    });
+    const resp = await fetch(API, {
+      method: 'PUT',
+      headers: { Authorization: 'token ' + TOKEN, 'Content-Type': 'application/json' },
+      body
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    fileSHA = data.content.sha;
+    saveBtn.className = 'save-btn saved';
+    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+    toast('Changes saved to GitHub successfully.');
+    setTimeout(() => {
+      saveBtn.className = 'save-btn';
+      saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save Changes';
+    }, 2500);
+  } catch(e) {
+    saveBtn.className = 'save-btn';
+    saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save Changes';
+    toast('Save failed: ' + e.message, false);
+  }
+}
+
+// keyboard shortcut Ctrl/Cmd+S
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveContent(); }
+});
+</script>
+</body>
+</html>
