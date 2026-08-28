@@ -241,13 +241,13 @@
   <div class="login-box">
     <div class="dial"><div class="inner"><i class="fas fa-lock"></i></div></div>
     <h2>NextLink CMS</h2>
-    <p>Enter your GitHub Personal Access Token to continue.</p>
+    <p>Enter your password to access the editor.</p>
     <div class="field">
-      <label>GitHub Token</label>
-      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxx" autocomplete="off"/>
+      <label>Password</label>
+      <input type="password" id="pw-input" placeholder="••••••••••••" autocomplete="current-password"/>
     </div>
     <button class="btn" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> &nbsp; Sign In</button>
-    <div id="login-err"><i class="fas fa-circle-exclamation"></i> Invalid token or no access to repo.</div>
+    <div id="login-err"><i class="fas fa-circle-exclamation"></i> Wrong password.</div>
   </div>
 </div>
 
@@ -265,14 +265,14 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="sidebar-section">Content</div>
-      <div class="sidebar-item active" onclick="showPanel('hero')"    data-panel="hero">    <i class="fas fa-house"></i> Hero</div>
-      <div class="sidebar-item"        onclick="showPanel('stats')"   data-panel="stats">   <i class="fas fa-chart-bar"></i> Stats</div>
+      <div class="sidebar-item active" onclick="showPanel('hero')"     data-panel="hero">    <i class="fas fa-house"></i> Hero</div>
+      <div class="sidebar-item"        onclick="showPanel('stats')"    data-panel="stats">   <i class="fas fa-chart-bar"></i> Stats</div>
       <div class="sidebar-item"        onclick="showPanel('services')" data-panel="services"><i class="fas fa-wrench"></i> Services</div>
-      <div class="sidebar-item"        onclick="showPanel('why')"     data-panel="why">     <i class="fas fa-medal"></i> Why Us</div>
+      <div class="sidebar-item"        onclick="showPanel('why')"      data-panel="why">     <i class="fas fa-medal"></i> Why Us</div>
       <div class="sidebar-item"        onclick="showPanel('projects')" data-panel="projects"><i class="fas fa-rocket"></i> Projects</div>
-      <div class="sidebar-item"        onclick="showPanel('contact')" data-panel="contact"> <i class="fas fa-envelope"></i> Contact</div>
+      <div class="sidebar-item"        onclick="showPanel('contact')"  data-panel="contact"> <i class="fas fa-envelope"></i> Contact</div>
       <div class="sidebar-section">Site</div>
-      <div class="sidebar-item"        onclick="showPanel('site')"    data-panel="site">    <i class="fas fa-gear"></i> Settings</div>
+      <div class="sidebar-item"        onclick="showPanel('site')"     data-panel="site">    <i class="fas fa-gear"></i> Settings</div>
       <div class="sidebar-section">Links</div>
       <a class="preview-link" href="https://nehemiahnganjo.github.io/nextlinkmw/" target="_blank">
         <i class="fas fa-arrow-up-right-from-square"></i> View Live Site
@@ -285,45 +285,84 @@
 <div id="toast"><i class="fas fa-check-circle ti"></i> <span id="toast-msg"></span></div>
 
 <script>
-const REPO   = 'Nehemiahnganjo/nextlinkmw';
-const FILE   = 'content.json';
-const RAW    = `https://raw.githubusercontent.com/${REPO}/main/${FILE}`;
-const API    = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+// ── ENCRYPTED TOKEN ────────────────────────────────────────
+// Token is AES-256-GCM encrypted with your password.
+// Wrong password = garbage = GitHub rejects it. Safe to ship in HTML.
+const ENCRYPTED_BLOB = 'aJzd0jrVANrIJtKROAQciraBFPROvCZKv7/Gl8IR3Bxo82esLArfZuS8GAdrMk8v2mk/lsf//bYRaW2OQvTjQ6OgGK9FDMQg9WJxEoxJ/Xxsdzak';
+const REPO = 'Nehemiahnganjo/nextlinkmw';
+const FILE = 'content.json';
+const API  = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+
 let TOKEN = '', content = {}, fileSHA = '';
 
-// ── AUTH ────────────────────────────────────────────────────
-function doLogin() {
-  const t = document.getElementById('token-input').value.trim();
-  if (!t) return;
-  fetch(API, { headers: { Authorization: 'token ' + t } })
-    .then(r => r.ok ? r.json() : Promise.reject())
-    .then(d => {
-      TOKEN   = t;
-      fileSHA = d.sha;
-      content = JSON.parse(atob(d.content.replace(/\n/g,'')));
-      localStorage.setItem('cms_token', t);
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      buildAllPanels();
-      showPanel('hero');
-    })
-    .catch(() => {
-      document.getElementById('login-err').style.display = 'block';
-    });
+async function decryptToken(password) {
+  const raw    = Uint8Array.from(atob(ENCRYPTED_BLOB), c => c.charCodeAt(0));
+  const salt   = raw.slice(0, 16);
+  const iv     = raw.slice(16, 28);
+  const ct     = raw.slice(28);
+
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']
+  );
+  const key = await crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:100000, hash:'SHA-256' },
+    keyMaterial,
+    { name:'AES-GCM', length:256 },
+    false, ['decrypt']
+  );
+  const plain = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, ct);
+  return new TextDecoder().decode(plain);
 }
-document.getElementById('token-input').addEventListener('keydown', e => {
+
+async function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (!pw) return;
+  const btn = document.querySelector('#login-screen .btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking…';
+  btn.disabled  = true;
+
+  try {
+    const tok = await decryptToken(pw);
+    // verify against GitHub API
+    const resp = await fetch(API, { headers: { Authorization: 'token ' + tok } });
+    if (!resp.ok) throw new Error('bad token');
+    const d = await resp.json();
+    TOKEN   = tok;
+    fileSHA = d.sha;
+    content = JSON.parse(atob(d.content.replace(/\n/g,'')));
+    sessionStorage.setItem('cms_unlocked', '1');
+    sessionStorage.setItem('cms_pw', pw);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    buildAllPanels();
+    showPanel('hero');
+  } catch(e) {
+    document.getElementById('login-err').style.display = 'block';
+  } finally {
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> &nbsp; Sign In';
+    btn.disabled  = false;
+  }
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
-// auto-login if token stored
-const stored = localStorage.getItem('cms_token');
-if (stored) { document.getElementById('token-input').value = stored; doLogin(); }
+
+// auto-resume session within same browser tab session
+const savedPw = sessionStorage.getItem('cms_pw');
+if (savedPw) {
+  document.getElementById('pw-input').value = savedPw;
+  doLogin();
+}
 
 function doLogout() {
-  localStorage.removeItem('cms_token');
+  sessionStorage.removeItem('cms_unlocked');
+  sessionStorage.removeItem('cms_pw');
   TOKEN = ''; content = {}; fileSHA = '';
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('token-input').value = '';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('login-err').style.display = 'none';
 }
 
 // ── NAV ────────────────────────────────────────────────────
@@ -348,24 +387,13 @@ function toast(msg, ok = true) {
 
 // ── HELPERS ────────────────────────────────────────────────
 function field(label, val, path, type='input', rows=2) {
-  const tag = type === 'textarea' ? `<textarea rows="${rows}" data-path="${path}">${esc(val)}</textarea>`
-                                  : `<input type="text" value="${esc(val)}" data-path="${path}"/>`;
+  const tag = type === 'textarea'
+    ? `<textarea rows="${rows}" data-path="${path}">${esc(val)}</textarea>`
+    : `<input type="text" value="${esc(val)}" data-path="${path}"/>`;
   return `<div class="form-group"><label>${label}</label>${tag}</div>`;
 }
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function readFields(el) {
-  el.querySelectorAll('[data-path]').forEach(inp => {
-    const path = inp.dataset.path.split('.');
-    let obj = content;
-    for (let i = 0; i < path.length - 1; i++) {
-      if (path[i].match(/^\d+$/)) obj = obj[+path[i]];
-      else obj = obj[path[i]];
-    }
-    const last = path[path.length - 1];
-    obj[last] = inp.value;
-  });
 }
 
 // ── TAGS WIDGET ────────────────────────────────────────────
@@ -382,15 +410,12 @@ function initTagsWidget(id, tags, pathPrefix) {
     el.innerHTML = current.map((t,i) =>
       `<span class="tag-chip">${esc(t)}<button onclick="removeTag('${id}',${i})">×</button></span>`
     ).join('') + `<input placeholder="Add tag, press Enter" onkeydown="addTag(event,'${id}')"/>`;
-    // sync to content
     const parts = pathPrefix.split('.');
     let obj = content;
     for (let i = 0; i < parts.length - 1; i++) obj = isNaN(parts[i]) ? obj[parts[i]] : obj[+parts[i]];
     obj[parts[parts.length-1]] = current;
   }
-  el._tags = current;
-  el._render = render;
-  render();
+  el._tags = current; el._render = render; render();
 }
 function addTag(e, id) {
   if (e.key !== 'Enter' && e.key !== ',') return;
@@ -401,11 +426,10 @@ function addTag(e, id) {
   e.target.value = '';
 }
 function removeTag(id, idx) {
-  const el = document.getElementById(id);
-  el._tags.splice(idx,1); el._render();
+  const el = document.getElementById(id); el._tags.splice(idx,1); el._render();
 }
 
-// ── COLLAPSIBLE CARD ───────────────────────────────────────
+// ── COLLAPSIBLE ────────────────────────────────────────────
 function card(title, bodyHtml, open=true) {
   const id = 'fc_' + Math.random().toString(36).slice(2);
   setTimeout(() => {
@@ -430,13 +454,10 @@ function toggleCard(id) {
   }
 }
 
-// ── BUILD PANELS ───────────────────────────────────────────
+// ── PANELS ────────────────────────────────────────────────
 function buildAllPanels() {
-  const main = document.getElementById('main-content');
-  main.innerHTML = [
-    buildHero(), buildStats(), buildServices(),
-    buildWhy(), buildProjects(), buildContact(), buildSite()
-  ].join('');
+  document.getElementById('main-content').innerHTML =
+    [buildHero(),buildStats(),buildServices(),buildWhy(),buildProjects(),buildContact(),buildSite()].join('');
 }
 
 function buildHero() {
@@ -483,10 +504,8 @@ function buildStats() {
   return `<div class="panel" id="panel-stats">
     <div class="panel-title">Stats Bar</div>
     <div class="panel-sub">The four numbers below the hero.</div>
-    <div class="form-card">
-      <div id="stats-list">${items}</div>
-      <button class="add-btn" onclick="addStat()"><i class="fas fa-plus"></i> Add Stat</button>
-    </div>
+    <div class="form-card"><div id="stats-list">${items}</div>
+    <button class="add-btn" onclick="addStat()"><i class="fas fa-plus"></i> Add Stat</button></div>
   </div>`;
 }
 
@@ -497,23 +516,21 @@ function buildServices() {
       <div class="item-num">Service ${i+1}</div>
       <button class="del-btn" onclick="delService(${i})"><i class="fas fa-times"></i></button>
       ${field('Title', sv.title, `services.items.${i}.title`)}
-      ${field('Icon (FontAwesome class)', sv.icon, `services.items.${i}.icon`)}
+      ${field('Icon (FontAwesome class e.g. fa-star)', sv.icon, `services.items.${i}.icon`)}
       ${field('Body', sv.body, `services.items.${i}.body`, 'textarea', 2)}
     </div>`
   ).join('');
   return `<div class="panel" id="panel-services">
     <div class="panel-title">Services</div>
-    <div class="panel-sub">Edit service cards. Icon = FontAwesome class e.g. fa-cash-register</div>
+    <div class="panel-sub">Edit service cards.</div>
     ${card('Section Header',
       field('Label', s.label, 'services.label') +
       field('Title Line 1', s.title_line1, 'services.title_line1') +
       field('Title Line 2', s.title_line2, 'services.title_line2') +
       field('Subtext', s.subtext, 'services.subtext', 'textarea', 2)
     , false)}
-    <div class="form-card">
-      <div id="services-list">${items}</div>
-      <button class="add-btn" onclick="addService()"><i class="fas fa-plus"></i> Add Service</button>
-    </div>
+    <div class="form-card"><div id="services-list">${items}</div>
+    <button class="add-btn" onclick="addService()"><i class="fas fa-plus"></i> Add Service</button></div>
   </div>`;
 }
 
@@ -530,7 +547,7 @@ function buildWhy() {
   ).join('');
   return `<div class="panel" id="panel-why">
     <div class="panel-title">Why Us</div>
-    <div class="panel-sub">The trust-building section with the dial panel.</div>
+    <div class="panel-sub">The trust-building section.</div>
     ${card('Section Header',
       field('Label', w.label, 'why.label') +
       field('Title Line 1', w.title_line1, 'why.title_line1') +
@@ -540,10 +557,8 @@ function buildWhy() {
       field('Panel Heading', w.panel_heading, 'why.panel_heading') +
       field('Panel Body', w.panel_body, 'why.panel_body', 'textarea', 3)
     , false)}
-    <div class="form-card">
-      <div id="why-list">${items}</div>
-      <button class="add-btn" onclick="addWhy()"><i class="fas fa-plus"></i> Add Point</button>
-    </div>
+    <div class="form-card"><div id="why-list">${items}</div>
+    <button class="add-btn" onclick="addWhy()"><i class="fas fa-plus"></i> Add Point</button></div>
   </div>`;
 }
 
@@ -569,10 +584,8 @@ function buildProjects() {
       field('Title', p.title, 'projects.title') +
       field('Subtext', p.subtext, 'projects.subtext', 'textarea', 2)
     , false)}
-    <div class="form-card">
-      <div id="projects-list">${items}</div>
-      <button class="add-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button>
-    </div>
+    <div class="form-card"><div id="projects-list">${items}</div>
+    <button class="add-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button></div>
   </div>`;
 }
 
@@ -601,10 +614,8 @@ function buildContact() {
       field('Subtext', c.subtext, 'contact.subtext', 'textarea', 2) +
       field('Button Text', c.btn_text, 'contact.btn_text')
     )}
-    <div class="form-card">
-      <div id="contact-list">${items}</div>
-      <button class="add-btn" onclick="addContact()"><i class="fas fa-plus"></i> Add Contact</button>
-    </div>
+    <div class="form-card"><div id="contact-list">${items}</div>
+    <button class="add-btn" onclick="addContact()"><i class="fas fa-plus"></i> Add Contact</button></div>
   </div>`;
 }
 
@@ -618,39 +629,23 @@ function buildSite() {
       field('Meta Description (SEO)', s.description, 'site.description', 'textarea', 2) +
       field('Logo Text', s.logo, 'site.logo')
     )}
-    ${card('Footer',
-      field('Footer Text', f.text, 'footer.text')
-    , false)}
+    ${card('Footer', field('Footer Text', f.text, 'footer.text'), false)}
   </div>`;
 }
 
 // ── REPEATER ACTIONS ───────────────────────────────────────
-function delStat(i)    { content.stats.splice(i,1);           rebuildPanel('stats'); }
-function delService(i) { content.services.items.splice(i,1);  rebuildPanel('services'); }
-function delWhy(i)     { content.why.items.splice(i,1);       rebuildPanel('why'); }
-function delProject(i) { content.projects.items.splice(i,1);  rebuildPanel('projects'); }
-function delContact(i) { content.contact.items.splice(i,1);   rebuildPanel('contact'); }
+function delStat(i)    { content.stats.splice(i,1);          rebuildPanel('stats'); }
+function delService(i) { content.services.items.splice(i,1); rebuildPanel('services'); }
+function delWhy(i)     { content.why.items.splice(i,1);      rebuildPanel('why'); }
+function delProject(i) { content.projects.items.splice(i,1); rebuildPanel('projects'); }
+function delContact(i) { content.contact.items.splice(i,1);  rebuildPanel('contact'); }
 
 function addStat()    { content.stats.push({number:'0',label:'New Stat'}); rebuildPanel('stats'); }
 function addService() { content.services.items.push({icon:'fa-star',title:'New Service',body:'Description.'}); rebuildPanel('services'); }
 function addWhy()     { content.why.items.push({icon:'fa-check',title:'New Point',body:'Details.'}); rebuildPanel('why'); }
 function addProject() { content.projects.items.push({emoji:'🚀',title:'New Project',body:'Description.',tags:[]}); rebuildPanel('projects'); }
-function addContact() { content.contact.items.push({icon:'fa-phone',label:'Phone',text:'+265 xxx xxx',href:'tel:+265xxx'}); rebuildPanel('contact'); }
+function addContact() { content.contact.items.push({icon:'fa-phone',label:'Phone',text:'+265 xxx',href:'tel:+265xxx'}); rebuildPanel('contact'); }
 
-function rebuildPanel(name) {
-  // flush current input values before rebuilding
-  flushInputs();
-  const builders = { hero:buildHero, stats:buildStats, services:buildServices,
-                     why:buildWhy, projects:buildProjects, contact:buildContact, site:buildSite };
-  const panel = document.getElementById('panel-' + name);
-  const tmp = document.createElement('div');
-  tmp.innerHTML = builders[name]();
-  const newPanel = tmp.querySelector('.panel');
-  panel.replaceWith(newPanel);
-  showPanel(name);
-}
-
-// ── FLUSH all live inputs into content before save ─────────
 function flushInputs() {
   document.querySelectorAll('[data-path]').forEach(inp => {
     const path = inp.dataset.path.split('.');
@@ -658,41 +653,46 @@ function flushInputs() {
     for (let i = 0; i < path.length - 1; i++)
       obj = isNaN(path[i]) ? obj[path[i]] : obj[+path[i]];
     const last = path[path.length-1];
-    if (isNaN(last)) obj[last] = inp.value;
-    else obj[+last] = inp.value;
+    if (isNaN(last)) obj[last] = inp.value; else obj[+last] = inp.value;
   });
-  // tags widgets sync themselves live, no extra flush needed
 }
 
-// ── SAVE TO GITHUB ─────────────────────────────────────────
+function rebuildPanel(name) {
+  flushInputs();
+  const builders = { hero:buildHero, stats:buildStats, services:buildServices,
+                      why:buildWhy, projects:buildProjects, contact:buildContact, site:buildSite };
+  const panel = document.getElementById('panel-' + name);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = builders[name]();
+  panel.replaceWith(tmp.querySelector('.panel'));
+  showPanel(name);
+}
+
+// ── SAVE ───────────────────────────────────────────────────
 async function saveContent() {
   flushInputs();
   const saveBtn = document.getElementById('save-btn');
   saveBtn.className = 'save-btn saving';
   saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
-
   try {
-    // get latest SHA
     const metaResp = await fetch(API, { headers: { Authorization: 'token ' + TOKEN } });
     const meta = await metaResp.json();
     fileSHA = meta.sha;
-
-    const body = JSON.stringify({
-      message: 'CMS update via admin panel',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-      sha: fileSHA
-    });
     const resp = await fetch(API, {
       method: 'PUT',
       headers: { Authorization: 'token ' + TOKEN, 'Content-Type': 'application/json' },
-      body
+      body: JSON.stringify({
+        message: 'CMS update via admin panel',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+        sha: fileSHA
+      })
     });
     if (!resp.ok) throw new Error(await resp.text());
     const data = await resp.json();
     fileSHA = data.content.sha;
     saveBtn.className = 'save-btn saved';
     saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-    toast('Changes saved to GitHub successfully.');
+    toast('Changes saved to GitHub.');
     setTimeout(() => {
       saveBtn.className = 'save-btn';
       saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save Changes';
@@ -704,7 +704,6 @@ async function saveContent() {
   }
 }
 
-// keyboard shortcut Ctrl/Cmd+S
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveContent(); }
 });
