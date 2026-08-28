@@ -233,10 +233,43 @@
       .main { padding: 16px; }
     }
   </style>
+  
+<style>
+  .color-row { display:flex; align-items:center; gap:12px; }
+  .color-row input[type=color] {
+    width:44px; height:44px; border:none; cursor:pointer;
+    border-radius:var(--r); background:var(--inset);
+    box-shadow:var(--inset-sh); padding:4px;
+  }
+  .color-row input[type=text] { flex:1; }
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; }
+  .toggle-row label { font-size:0.85rem; font-weight:500; color:var(--tx-1); }
+  .tog {
+    width:48px; height:26px; border-radius:99px; border:none; cursor:pointer;
+    background:var(--inset); box-shadow:var(--inset-sh);
+    position:relative; transition:background 200ms;
+  }
+  .tog.on { background:var(--green); }
+  .tog::after {
+    content:''; position:absolute; top:3px; left:3px;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--card); box-shadow:var(--raised);
+    transition:transform 200ms;
+  }
+  .tog.on::after { transform:translateX(22px); }
+  .theme-options { display:flex; gap:10px; margin-top:6px; }
+  .theme-opt {
+    flex:1; padding:10px; border:none; cursor:pointer; border-radius:var(--r);
+    font-family:inherit; font-size:0.82rem; font-weight:600;
+    background:var(--inset); box-shadow:var(--inset-sh); color:var(--tx-2);
+    transition:box-shadow 150ms, color 150ms;
+  }
+  .theme-opt.selected { box-shadow:var(--raised); color:var(--blue); }
+  .drag-handle { cursor:grab; color:var(--tx-3); padding:0 8px 0 0; font-size:0.9rem; }
+</style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="dial"><div class="inner"><i class="fas fa-lock"></i></div></div>
@@ -251,7 +284,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="topbar">
     <div class="logo"><span>Next</span>Link CMS</div>
@@ -271,8 +303,11 @@
       <div class="sidebar-item"        onclick="showPanel('why')"      data-panel="why">     <i class="fas fa-medal"></i> Why Us</div>
       <div class="sidebar-item"        onclick="showPanel('projects')" data-panel="projects"><i class="fas fa-rocket"></i> Projects</div>
       <div class="sidebar-item"        onclick="showPanel('contact')"  data-panel="contact"> <i class="fas fa-envelope"></i> Contact</div>
-      <div class="sidebar-section">Site</div>
-      <div class="sidebar-item"        onclick="showPanel('site')"     data-panel="site">    <i class="fas fa-gear"></i> Settings</div>
+      <div class="sidebar-section">Settings</div>
+      <div class="sidebar-item"        onclick="showPanel('branding')" data-panel="branding"><i class="fas fa-palette"></i> Branding</div>
+      <div class="sidebar-item"        onclick="showPanel('social')"   data-panel="social">  <i class="fas fa-share-nodes"></i> Social</div>
+      <div class="sidebar-item"        onclick="showPanel('analytics')"data-panel="analytics"><i class="fas fa-chart-line"></i> Analytics</div>
+      <div class="sidebar-item"        onclick="showPanel('site')"     data-panel="site">    <i class="fas fa-gear"></i> Site</div>
       <div class="sidebar-section">Links</div>
       <a class="preview-link" href="https://nehemiahnganjo.github.io/nextlinkmw/" target="_blank">
         <i class="fas fa-arrow-up-right-from-square"></i> View Live Site
@@ -285,428 +320,403 @@
 <div id="toast"><i class="fas fa-check-circle ti"></i> <span id="toast-msg"></span></div>
 
 <script>
-// ── ENCRYPTED TOKEN ────────────────────────────────────────
-// Token is AES-256-GCM encrypted with your password.
-// Wrong password = garbage = GitHub rejects it. Safe to ship in HTML.
 const ENCRYPTED_BLOB = 'aJzd0jrVANrIJtKROAQciraBFPROvCZKv7/Gl8IR3Bxo82esLArfZuS8GAdrMk8v2mk/lsf//bYRaW2OQvTjQ6OgGK9FDMQg9WJxEoxJ/Xxsdzak';
 const REPO = 'Nehemiahnganjo/nextlinkmw';
 const FILE = 'content.json';
 const API  = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
-
 let TOKEN = '', content = {}, fileSHA = '';
 
+// ── DECRYPT ────────────────────────────────────────────────
 async function decryptToken(password) {
-  const raw    = Uint8Array.from(atob(ENCRYPTED_BLOB), c => c.charCodeAt(0));
-  const salt   = raw.slice(0, 16);
-  const iv     = raw.slice(16, 28);
-  const ct     = raw.slice(28);
-
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']
+  const raw  = Uint8Array.from(atob(ENCRYPTED_BLOB), c => c.charCodeAt(0));
+  const salt = raw.slice(0,16), iv = raw.slice(16,28), ct = raw.slice(28);
+  const km   = await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
+  const key  = await crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},
+    km, {name:'AES-GCM',length:256}, false, ['decrypt']
   );
-  const key = await crypto.subtle.deriveKey(
-    { name:'PBKDF2', salt, iterations:100000, hash:'SHA-256' },
-    keyMaterial,
-    { name:'AES-GCM', length:256 },
-    false, ['decrypt']
-  );
-  const plain = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, ct);
+  const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
   return new TextDecoder().decode(plain);
 }
 
 async function doLogin() {
-  const pw = document.getElementById('pw-input').value;
-  if (!pw) return;
+  const pw = document.getElementById('pw-input').value; if (!pw) return;
   const btn = document.querySelector('#login-screen .btn');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking…';
-  btn.disabled  = true;
-
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking…'; btn.disabled = true;
   try {
-    const tok = await decryptToken(pw);
-    // verify against GitHub API
-    const resp = await fetch(API, { headers: { Authorization: 'token ' + tok } });
-    if (!resp.ok) throw new Error('bad token');
+    const tok  = await decryptToken(pw);
+    const resp = await fetch(API, {headers:{Authorization:'token '+tok}});
+    if (!resp.ok) throw new Error();
     const d = await resp.json();
-    TOKEN   = tok;
-    fileSHA = d.sha;
+    TOKEN = tok; fileSHA = d.sha;
     content = JSON.parse(atob(d.content.replace(/\n/g,'')));
-    sessionStorage.setItem('cms_unlocked', '1');
     sessionStorage.setItem('cms_pw', pw);
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    buildAllPanels();
-    showPanel('hero');
+    buildAllPanels(); showPanel('hero');
   } catch(e) {
     document.getElementById('login-err').style.display = 'block';
   } finally {
-    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> &nbsp; Sign In';
-    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> &nbsp; Sign In'; btn.disabled = false;
   }
 }
-
-document.getElementById('pw-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-// auto-resume session within same browser tab session
-const savedPw = sessionStorage.getItem('cms_pw');
-if (savedPw) {
-  document.getElementById('pw-input').value = savedPw;
-  doLogin();
-}
+document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+const _spw = sessionStorage.getItem('cms_pw');
+if (_spw) { document.getElementById('pw-input').value = _spw; doLogin(); }
 
 function doLogout() {
-  sessionStorage.removeItem('cms_unlocked');
-  sessionStorage.removeItem('cms_pw');
-  TOKEN = ''; content = {}; fileSHA = '';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('pw-input').value = '';
-  document.getElementById('login-err').style.display = 'none';
+  sessionStorage.removeItem('cms_pw'); TOKEN=''; content={}; fileSHA='';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-err').style.display='none';
 }
 
-// ── NAV ────────────────────────────────────────────────────
+// ── NAV ─────────────────────────────────────────────────────
 function showPanel(name) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  const p = document.getElementById('panel-' + name);
-  if (p) p.classList.add('active');
-  const si = document.querySelector(`.sidebar-item[data-panel="${name}"]`);
-  if (si) si.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('panel-'+name)?.classList.add('active');
+  document.querySelector(`.sidebar-item[data-panel="${name}"]`)?.classList.add('active');
 }
 
-// ── TOAST ──────────────────────────────────────────────────
-function toast(msg, ok = true) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.className = 'show ' + (ok ? 'ok' : 'err');
-  t.querySelector('.ti').className = 'ti fas ' + (ok ? 'fa-check-circle' : 'fa-circle-exclamation');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('show'), 3000);
+// ── TOAST ───────────────────────────────────────────────────
+function toast(msg,ok=true) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.className='show '+(ok?'ok':'err');
+  t.querySelector('.ti').className='ti fas '+(ok?'fa-check-circle':'fa-circle-exclamation');
+  clearTimeout(t._tid); t._tid=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ── HELPERS ────────────────────────────────────────────────
-function field(label, val, path, type='input', rows=2) {
-  const tag = type === 'textarea'
+// ── HELPERS ─────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function field(label,val,path,type='input',rows=2) {
+  const tag = type==='textarea'
     ? `<textarea rows="${rows}" data-path="${path}">${esc(val)}</textarea>`
     : `<input type="text" value="${esc(val)}" data-path="${path}"/>`;
   return `<div class="form-group"><label>${label}</label>${tag}</div>`;
 }
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function colorField(label,val,path) {
+  const id='cf_'+Math.random().toString(36).slice(2);
+  setTimeout(()=>{
+    const sw=document.getElementById(id);
+    if(sw){ sw.value=val; sw.addEventListener('input',e=>{
+      const txt=document.querySelector(`[data-path="${path}"]`);
+      if(txt)txt.value=e.target.value;
+    });}
+  },0);
+  return `<div class="form-group"><label>${label}</label>
+    <div class="color-row">
+      <input type="color" id="${id}" value="${esc(val)}"/>
+      <input type="text" value="${esc(val)}" data-path="${path}" oninput="syncColor('${id}',this.value)"/>
+    </div></div>`;
 }
-
-// ── TAGS WIDGET ────────────────────────────────────────────
-function tagsWidget(tags, pathPrefix) {
-  const id = 'tags_' + Math.random().toString(36).slice(2);
-  setTimeout(() => initTagsWidget(id, tags, pathPrefix), 0);
-  return `<div class="form-group"><label>Tags</label><div class="tags-input" id="${id}" data-tags-path="${pathPrefix}"></div></div>`;
+function syncColor(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+function toggleField(label,val,path) {
+  const id='tog_'+Math.random().toString(36).slice(2);
+  return `<div class="form-group toggle-row">
+    <label>${label}</label>
+    <button class="tog ${val?'on':''}" id="${id}" data-path="${path}" data-bool="true"
+      onclick="this.classList.toggle('on')">
+    </button></div>`;
 }
-function initTagsWidget(id, tags, pathPrefix) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let current = [...tags];
-  function render() {
-    el.innerHTML = current.map((t,i) =>
-      `<span class="tag-chip">${esc(t)}<button onclick="removeTag('${id}',${i})">×</button></span>`
-    ).join('') + `<input placeholder="Add tag, press Enter" onkeydown="addTag(event,'${id}')"/>`;
-    const parts = pathPrefix.split('.');
-    let obj = content;
-    for (let i = 0; i < parts.length - 1; i++) obj = isNaN(parts[i]) ? obj[parts[i]] : obj[+parts[i]];
-    obj[parts[parts.length-1]] = current;
-  }
-  el._tags = current; el._render = render; render();
+function themeField(val,path) {
+  return `<div class="form-group"><label>Default Theme</label>
+    <div class="theme-options">
+      <button class="theme-opt ${val==='light'?'selected':''}" onclick="pickTheme(this,'light','${path}')">☀️ Light</button>
+      <button class="theme-opt ${val==='dark'?'selected':''}"  onclick="pickTheme(this,'dark','${path}')">🌙 Dark</button>
+    </div>
+    <input type="hidden" data-path="${path}" value="${esc(val)}"/>
+  </div>`;
 }
-function addTag(e, id) {
-  if (e.key !== 'Enter' && e.key !== ',') return;
-  e.preventDefault();
-  const el = document.getElementById(id);
-  const val = e.target.value.trim().replace(/,$/,'');
-  if (val && !el._tags.includes(val)) { el._tags.push(val); el._render(); }
-  e.target.value = '';
+function pickTheme(el,val,path) {
+  el.closest('.theme-options').querySelectorAll('.theme-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  el.closest('.form-group').querySelector(`[data-path="${path}"]`).value=val;
 }
-function removeTag(id, idx) {
-  const el = document.getElementById(id); el._tags.splice(idx,1); el._render();
-}
-
-// ── COLLAPSIBLE ────────────────────────────────────────────
-function card(title, bodyHtml, open=true) {
-  const id = 'fc_' + Math.random().toString(36).slice(2);
-  setTimeout(() => {
-    const b = document.getElementById(id);
-    if (b) b.style.maxHeight = open ? b.scrollHeight + 'px' : '0';
-  }, 0);
+function card(title,bodyHtml,open=true) {
+  const id='fc_'+Math.random().toString(36).slice(2);
+  setTimeout(()=>{const b=document.getElementById(id);if(b)b.style.maxHeight=open?b.scrollHeight+'px':'0';},0);
   return `<div class="form-card">
     <div class="form-card-header" onclick="toggleCard('${id}')">
-      <h3>${title}</h3>
-      <i class="fas fa-chevron-${open?'up':'down'} toggle-icon" id="ic_${id}"></i>
+      <h3>${title}</h3><i class="fas fa-chevron-${open?'up':'down'} toggle-icon" id="ic_${id}"></i>
     </div>
     <div class="form-card-body" id="${id}">${bodyHtml}</div>
   </div>`;
 }
 function toggleCard(id) {
-  const b = document.getElementById(id);
-  const ic = document.getElementById('ic_'+id);
-  if (b.style.maxHeight && b.style.maxHeight !== '0px') {
-    b.style.maxHeight = '0'; ic.className = 'fas fa-chevron-down toggle-icon';
-  } else {
-    b.style.maxHeight = b.scrollHeight + 5000 + 'px'; ic.className = 'fas fa-chevron-up toggle-icon';
-  }
+  const b=document.getElementById(id),ic=document.getElementById('ic_'+id);
+  if(b.style.maxHeight&&b.style.maxHeight!=='0px'){b.style.maxHeight='0';ic.className='fas fa-chevron-down toggle-icon';}
+  else{b.style.maxHeight=b.scrollHeight+5000+'px';ic.className='fas fa-chevron-up toggle-icon';}
 }
 
-// ── PANELS ────────────────────────────────────────────────
+// ── TAGS ────────────────────────────────────────────────────
+function tagsWidget(tags,pathPrefix) {
+  const id='tags_'+Math.random().toString(36).slice(2);
+  setTimeout(()=>initTagsWidget(id,tags,pathPrefix),0);
+  return `<div class="form-group"><label>Tags</label><div class="tags-input" id="${id}" data-tags-path="${pathPrefix}"></div></div>`;
+}
+function initTagsWidget(id,tags,pathPrefix) {
+  const el=document.getElementById(id); if(!el) return;
+  let current=[...tags];
+  function render() {
+    el.innerHTML=current.map((t,i)=>
+      `<span class="tag-chip">${esc(t)}<button onclick="removeTag('${id}',${i})">×</button></span>`
+    ).join('')+`<input placeholder="Add tag, Enter" onkeydown="addTag(event,'${id}')"/>`;
+    const parts=pathPrefix.split('.');
+    let obj=content;
+    for(let i=0;i<parts.length-1;i++) obj=isNaN(parts[i])?obj[parts[i]]:obj[+parts[i]];
+    obj[parts[parts.length-1]]=current;
+  }
+  el._tags=current; el._render=render; render();
+}
+function addTag(e,id) {
+  if(e.key!=='Enter'&&e.key!==',') return; e.preventDefault();
+  const el=document.getElementById(id);
+  const val=e.target.value.trim().replace(/,$/,'');
+  if(val&&!el._tags.includes(val)){el._tags.push(val);el._render();}
+  e.target.value='';
+}
+function removeTag(id,idx) {const el=document.getElementById(id);el._tags.splice(idx,1);el._render();}
+
+// ── PANELS ──────────────────────────────────────────────────
 function buildAllPanels() {
   document.getElementById('main-content').innerHTML =
-    [buildHero(),buildStats(),buildServices(),buildWhy(),buildProjects(),buildContact(),buildSite()].join('');
+    [buildHero(),buildStats(),buildServices(),buildWhy(),
+     buildProjects(),buildContact(),buildBranding(),
+     buildSocial(),buildAnalytics(),buildSite()].join('');
 }
 
 function buildHero() {
-  const h = content.hero; const n = content.nav;
+  const h=content.hero,n=content.nav;
   return `<div class="panel" id="panel-hero">
     <div class="panel-title">Hero Section</div>
     <div class="panel-sub">The first thing visitors see.</div>
     ${card('Badge & Headline',
-      field('Badge Text', h.badge, 'hero.badge') +
-      field('Heading Line 1', h.heading_line1, 'hero.heading_line1') +
-      field('Heading Line 2 (accent)', h.heading_line2, 'hero.heading_line2')
-    )}
+      field('Badge Text',h.badge,'hero.badge')+
+      field('Heading Line 1',h.heading_line1,'hero.heading_line1')+
+      field('Heading Line 2 (accent)',h.heading_line2,'hero.heading_line2'))}
     ${card('Body & Buttons',
-      field('Subtext', h.subtext, 'hero.subtext', 'textarea', 3) +
-      `<div class="form-row">` +
-        field('Primary Button Text', h.btn_primary_text, 'hero.btn_primary_text') +
-        field('Primary Button Link', h.btn_primary_href, 'hero.btn_primary_href') +
-      `</div><div class="form-row">` +
-        field('Ghost Button Text', h.btn_ghost_text, 'hero.btn_ghost_text') +
-        field('Ghost Button Link', h.btn_ghost_href, 'hero.btn_ghost_href') +
-      `</div>`
-    )}
-    ${card('Nav CTA',
-      `<div class="form-row">` +
-        field('CTA Button Text', n.cta_text, 'nav.cta_text') +
-        field('CTA Button Link', n.cta_href, 'nav.cta_href') +
-      `</div>`
-    , false)}
+      field('Subtext',h.subtext,'hero.subtext','textarea',3)+
+      `<div class="form-row">`+field('Primary Button Text',h.btn_primary_text,'hero.btn_primary_text')+field('Primary Button Link',h.btn_primary_href,'hero.btn_primary_href')+`</div>`+
+      `<div class="form-row">`+field('Ghost Button Text',h.btn_ghost_text,'hero.btn_ghost_text')+field('Ghost Button Link',h.btn_ghost_href,'hero.btn_ghost_href')+`</div>`)}
+    ${card('Nav CTA',`<div class="form-row">`+field('CTA Text',n.cta_text,'nav.cta_text')+field('CTA Link',n.cta_href,'nav.cta_href')+`</div>`,false)}
   </div>`;
 }
 
 function buildStats() {
-  const stats = content.stats;
-  const items = stats.map((s,i) =>
-    `<div class="repeater-item">
-      <div class="item-num">Stat ${i+1}</div>
-      <button class="del-btn" onclick="delStat(${i})"><i class="fas fa-times"></i></button>
-      <div class="form-row">
-        ${field('Number / Value', s.number, `stats.${i}.number`)}
-        ${field('Label', s.label, `stats.${i}.label`)}
-      </div>
-    </div>`
+  const items=content.stats.map((s,i)=>
+    `<div class="repeater-item"><div class="item-num">Stat ${i+1}</div>
+    <button class="del-btn" onclick="delItem('stats',null,${i})"><i class="fas fa-times"></i></button>
+    <div class="form-row">${field('Value',s.number,`stats.${i}.number`)}${field('Label',s.label,`stats.${i}.label`)}</div></div>`
   ).join('');
   return `<div class="panel" id="panel-stats">
-    <div class="panel-title">Stats Bar</div>
-    <div class="panel-sub">The four numbers below the hero.</div>
+    <div class="panel-title">Stats Bar</div><div class="panel-sub">The numbers below the hero.</div>
     <div class="form-card"><div id="stats-list">${items}</div>
-    <button class="add-btn" onclick="addStat()"><i class="fas fa-plus"></i> Add Stat</button></div>
+    <button class="add-btn" onclick="addItem('stats')"><i class="fas fa-plus"></i> Add Stat</button></div>
   </div>`;
 }
 
 function buildServices() {
-  const s = content.services;
-  const items = s.items.map((sv,i) =>
+  const s=content.services;
+  const items=s.items.map((sv,i)=>
     `<div class="repeater-item">
-      <div class="item-num">Service ${i+1}</div>
-      <button class="del-btn" onclick="delService(${i})"><i class="fas fa-times"></i></button>
-      ${field('Title', sv.title, `services.items.${i}.title`)}
-      ${field('Icon (FontAwesome class e.g. fa-star)', sv.icon, `services.items.${i}.icon`)}
-      ${field('Body', sv.body, `services.items.${i}.body`, 'textarea', 2)}
+      <div class="item-num" style="display:flex;align-items:center;gap:8px;">
+        <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> Service ${i+1}
+      </div>
+      <button class="del-btn" onclick="delItem('services','items',${i})"><i class="fas fa-times"></i></button>
+      ${field('Title',sv.title,`services.items.${i}.title`)}
+      ${field('Icon (FontAwesome e.g. fa-star)',sv.icon,`services.items.${i}.icon`)}
+      ${field('Body',sv.body,`services.items.${i}.body`,'textarea',2)}
+      ${toggleField('Visible on site',sv.visible!==false,`services.items.${i}.visible`)}
     </div>`
   ).join('');
   return `<div class="panel" id="panel-services">
-    <div class="panel-title">Services</div>
-    <div class="panel-sub">Edit service cards.</div>
+    <div class="panel-title">Services</div><div class="panel-sub">Edit cards. Toggle visibility without deleting.</div>
     ${card('Section Header',
-      field('Label', s.label, 'services.label') +
-      field('Title Line 1', s.title_line1, 'services.title_line1') +
-      field('Title Line 2', s.title_line2, 'services.title_line2') +
-      field('Subtext', s.subtext, 'services.subtext', 'textarea', 2)
-    , false)}
+      field('Label',s.label,'services.label')+field('Title Line 1',s.title_line1,'services.title_line1')+
+      field('Title Line 2',s.title_line2,'services.title_line2')+field('Subtext',s.subtext,'services.subtext','textarea',2),false)}
     <div class="form-card"><div id="services-list">${items}</div>
-    <button class="add-btn" onclick="addService()"><i class="fas fa-plus"></i> Add Service</button></div>
+    <button class="add-btn" onclick="addItem('services')"><i class="fas fa-plus"></i> Add Service</button></div>
   </div>`;
 }
 
 function buildWhy() {
-  const w = content.why;
-  const items = w.items.map((wi,i) =>
+  const w=content.why;
+  const items=w.items.map((wi,i)=>
     `<div class="repeater-item">
       <div class="item-num">Point ${i+1}</div>
-      <button class="del-btn" onclick="delWhy(${i})"><i class="fas fa-times"></i></button>
-      ${field('Title', wi.title, `why.items.${i}.title`)}
-      ${field('Icon (FontAwesome class)', wi.icon, `why.items.${i}.icon`)}
-      ${field('Body', wi.body, `why.items.${i}.body`, 'textarea', 2)}
+      <button class="del-btn" onclick="delItem('why','items',${i})"><i class="fas fa-times"></i></button>
+      ${field('Title',wi.title,`why.items.${i}.title`)}
+      ${field('Icon',wi.icon,`why.items.${i}.icon`)}
+      ${field('Body',wi.body,`why.items.${i}.body`,'textarea',2)}
     </div>`
   ).join('');
   return `<div class="panel" id="panel-why">
     <div class="panel-title">Why Us</div>
-    <div class="panel-sub">The trust-building section.</div>
-    ${card('Section Header',
-      field('Label', w.label, 'why.label') +
-      field('Title Line 1', w.title_line1, 'why.title_line1') +
-      field('Title Line 2', w.title_line2, 'why.title_line2')
-    , false)}
-    ${card('Panel (right side)',
-      field('Panel Heading', w.panel_heading, 'why.panel_heading') +
-      field('Panel Body', w.panel_body, 'why.panel_body', 'textarea', 3)
-    , false)}
+    ${card('Section Header',field('Label',w.label,'why.label')+field('Title Line 1',w.title_line1,'why.title_line1')+field('Title Line 2',w.title_line2,'why.title_line2'),false)}
+    ${card('Side Panel',field('Heading',w.panel_heading,'why.panel_heading')+field('Body',w.panel_body,'why.panel_body','textarea',3),false)}
     <div class="form-card"><div id="why-list">${items}</div>
-    <button class="add-btn" onclick="addWhy()"><i class="fas fa-plus"></i> Add Point</button></div>
+    <button class="add-btn" onclick="addItem('why')"><i class="fas fa-plus"></i> Add Point</button></div>
   </div>`;
 }
 
 function buildProjects() {
-  const p = content.projects;
-  const items = p.items.map((pi,i) =>
+  const p=content.projects;
+  const items=p.items.map((pi,i)=>
     `<div class="repeater-item">
       <div class="item-num">Project ${i+1}</div>
-      <button class="del-btn" onclick="delProject(${i})"><i class="fas fa-times"></i></button>
-      <div class="form-row">
-        ${field('Emoji', pi.emoji, `projects.items.${i}.emoji`)}
-        ${field('Title', pi.title, `projects.items.${i}.title`)}
-      </div>
-      ${field('Description', pi.body, `projects.items.${i}.body`, 'textarea', 3)}
-      ${tagsWidget(pi.tags, `projects.items.${i}.tags`)}
+      <button class="del-btn" onclick="delItem('projects','items',${i})"><i class="fas fa-times"></i></button>
+      <div class="form-row">${field('Emoji',pi.emoji,`projects.items.${i}.emoji`)}${field('Title',pi.title,`projects.items.${i}.title`)}</div>
+      ${field('Description',pi.body,`projects.items.${i}.body`,'textarea',3)}
+      ${field('Link URL (optional)',pi.link||'',`projects.items.${i}.link`)}
+      ${tagsWidget(pi.tags,`projects.items.${i}.tags`)}
+      ${toggleField('Visible on site',pi.visible!==false,`projects.items.${i}.visible`)}
     </div>`
   ).join('');
   return `<div class="panel" id="panel-projects">
-    <div class="panel-title">Projects</div>
-    <div class="panel-sub">Showcase cards. Add tags by typing and pressing Enter.</div>
-    ${card('Section Header',
-      field('Label', p.label, 'projects.label') +
-      field('Title', p.title, 'projects.title') +
-      field('Subtext', p.subtext, 'projects.subtext', 'textarea', 2)
-    , false)}
+    <div class="panel-title">Projects</div><div class="panel-sub">Add a link URL to make cards clickable.</div>
+    ${card('Section Header',field('Label',p.label,'projects.label')+field('Title',p.title,'projects.title')+field('Subtext',p.subtext,'projects.subtext','textarea',2),false)}
     <div class="form-card"><div id="projects-list">${items}</div>
-    <button class="add-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button></div>
+    <button class="add-btn" onclick="addItem('projects')"><i class="fas fa-plus"></i> Add Project</button></div>
   </div>`;
 }
 
 function buildContact() {
-  const c = content.contact;
-  const items = c.items.map((ci,i) =>
+  const c=content.contact;
+  const items=c.items.map((ci,i)=>
     `<div class="repeater-item">
       <div class="item-num">Contact ${i+1}</div>
-      <button class="del-btn" onclick="delContact(${i})"><i class="fas fa-times"></i></button>
-      <div class="form-row">
-        ${field('Label', ci.label, `contact.items.${i}.label`)}
-        ${field('Icon class', ci.icon, `contact.items.${i}.icon`)}
-      </div>
-      <div class="form-row">
-        ${field('Display Text', ci.text, `contact.items.${i}.text`)}
-        ${field('Link (href)', ci.href, `contact.items.${i}.href`)}
-      </div>
+      <button class="del-btn" onclick="delItem('contact','items',${i})"><i class="fas fa-times"></i></button>
+      <div class="form-row">${field('Label',ci.label,`contact.items.${i}.label`)}${field('Icon class',ci.icon,`contact.items.${i}.icon`)}</div>
+      <div class="form-row">${field('Display Text',ci.text,`contact.items.${i}.text`)}${field('Link (href)',ci.href,`contact.items.${i}.href`)}</div>
     </div>`
   ).join('');
   return `<div class="panel" id="panel-contact">
     <div class="panel-title">Contact Section</div>
-    <div class="panel-sub">Contact cards and CTA button.</div>
     ${card('Section Header',
-      field('Label', c.label, 'contact.label') +
-      field('Title', c.title, 'contact.title') +
-      field('Subtext', c.subtext, 'contact.subtext', 'textarea', 2) +
-      field('Button Text', c.btn_text, 'contact.btn_text')
-    )}
+      field('Label',c.label,'contact.label')+field('Title',c.title,'contact.title')+
+      field('Subtext',c.subtext,'contact.subtext','textarea',2)+field('Button Text',c.btn_text,'contact.btn_text'))}
+    ${card('Details',
+      field('Business Hours',c.business_hours||'','contact.business_hours')+
+      field('Google Maps Embed URL',c.maps_embed||'','contact.maps_embed'))}
     <div class="form-card"><div id="contact-list">${items}</div>
-    <button class="add-btn" onclick="addContact()"><i class="fas fa-plus"></i> Add Contact</button></div>
+    <button class="add-btn" onclick="addItem('contact')"><i class="fas fa-plus"></i> Add Contact</button></div>
+  </div>`;
+}
+
+function buildBranding() {
+  const b=content.branding||{};
+  return `<div class="panel" id="panel-branding">
+    <div class="panel-title">Branding</div><div class="panel-sub">Colours, theme, and images.</div>
+    ${card('Colours & Theme',
+      colorField('Accent Colour',b.accent_color||'#4A7FE0','branding.accent_color')+
+      themeField(b.default_theme||'light','branding.default_theme'))}
+    ${card('Images',
+      field('OG / Share Image URL (shown when sharing on WhatsApp, LinkedIn etc.)',b.og_image||'','branding.og_image')+
+      field('Favicon URL',b.favicon||'','branding.favicon'),false)}
+  </div>`;
+}
+
+function buildSocial() {
+  const s=content.social||{};
+  return `<div class="panel" id="panel-social">
+    <div class="panel-title">Social & WhatsApp</div><div class="panel-sub">Leave blank to hide.</div>
+    ${card('WhatsApp',
+      field('WhatsApp Number (digits only, e.g. 265882730381)',s.whatsapp_number||'','social.whatsapp_number')+
+      field('Pre-filled Message',s.whatsapp_prefill||'','social.whatsapp_prefill','textarea',2))}
+    ${card('Social Links',
+      field('Facebook URL',s.facebook||'','social.facebook')+
+      field('X / Twitter URL',s.twitter||'','social.twitter')+
+      field('LinkedIn URL',s.linkedin||'','social.linkedin')+
+      field('GitHub URL',s.github||'','social.github'),false)}
+  </div>`;
+}
+
+function buildAnalytics() {
+  const a=content.analytics||{};
+  return `<div class="panel" id="panel-analytics">
+    <div class="panel-title">Analytics</div><div class="panel-sub">Google Analytics 4.</div>
+    ${card('Google Analytics',
+      field('GA4 Measurement ID (e.g. G-XXXXXXXXXX)',a.ga4_id||'','analytics.ga4_id')+
+      toggleField('Enable Analytics',a.enabled||false,'analytics.enabled'))}
   </div>`;
 }
 
 function buildSite() {
-  const s = content.site; const f = content.footer;
+  const s=content.site,f=content.footer;
   return `<div class="panel" id="panel-site">
     <div class="panel-title">Site Settings</div>
-    <div class="panel-sub">Global meta and footer.</div>
     ${card('Identity',
-      field('Site Title (browser tab)', s.title, 'site.title') +
-      field('Meta Description (SEO)', s.description, 'site.description', 'textarea', 2) +
-      field('Logo Text', s.logo, 'site.logo')
-    )}
-    ${card('Footer', field('Footer Text', f.text, 'footer.text'), false)}
+      field('Site Title (browser tab)',s.title,'site.title')+
+      field('Meta Description (SEO)',s.description,'site.description','textarea',2)+
+      field('Logo Text',s.logo,'site.logo'))}
+    ${card('Footer',field('Footer Text',f.text,'footer.text'),false)}
   </div>`;
 }
 
-// ── REPEATER ACTIONS ───────────────────────────────────────
-function delStat(i)    { content.stats.splice(i,1);          rebuildPanel('stats'); }
-function delService(i) { content.services.items.splice(i,1); rebuildPanel('services'); }
-function delWhy(i)     { content.why.items.splice(i,1);      rebuildPanel('why'); }
-function delProject(i) { content.projects.items.splice(i,1); rebuildPanel('projects'); }
-function delContact(i) { content.contact.items.splice(i,1);  rebuildPanel('contact'); }
+// ── GENERIC REPEATER ────────────────────────────────────────
+const defaults = {
+  stats:    ()=>([content.stats,null,{number:'0',label:'New Stat'}]),
+  services: ()=>([content.services.items,'services',{icon:'fa-star',title:'New Service',body:'Description.',visible:true}]),
+  why:      ()=>([content.why.items,'why',{icon:'fa-check',title:'New Point',body:'Details.'}]),
+  projects: ()=>([content.projects.items,'projects',{emoji:'🚀',title:'New Project',body:'Description.',tags:[],link:'',visible:true}]),
+  contact:  ()=>([content.contact.items,'contact',{icon:'fa-phone',label:'Phone',text:'+265 xxx',href:'tel:+265xxx'}]),
+};
+function addItem(section) {
+  const [arr,,def] = defaults[section]();
+  arr.push({...def}); rebuildPanel(section);
+}
+function delItem(section,subkey,idx) {
+  const [arr] = defaults[section](); arr.splice(idx,1); rebuildPanel(section);
+}
+function rebuildPanel(name) {
+  flushInputs();
+  const builders={hero:buildHero,stats:buildStats,services:buildServices,why:buildWhy,
+                   projects:buildProjects,contact:buildContact,branding:buildBranding,
+                   social:buildSocial,analytics:buildAnalytics,site:buildSite};
+  const panel=document.getElementById('panel-'+name);
+  const tmp=document.createElement('div'); tmp.innerHTML=builders[name]();
+  panel.replaceWith(tmp.querySelector('.panel')); showPanel(name);
+}
 
-function addStat()    { content.stats.push({number:'0',label:'New Stat'}); rebuildPanel('stats'); }
-function addService() { content.services.items.push({icon:'fa-star',title:'New Service',body:'Description.'}); rebuildPanel('services'); }
-function addWhy()     { content.why.items.push({icon:'fa-check',title:'New Point',body:'Details.'}); rebuildPanel('why'); }
-function addProject() { content.projects.items.push({emoji:'🚀',title:'New Project',body:'Description.',tags:[]}); rebuildPanel('projects'); }
-function addContact() { content.contact.items.push({icon:'fa-phone',label:'Phone',text:'+265 xxx',href:'tel:+265xxx'}); rebuildPanel('contact'); }
-
+// ── FLUSH ────────────────────────────────────────────────────
 function flushInputs() {
   document.querySelectorAll('[data-path]').forEach(inp => {
-    const path = inp.dataset.path.split('.');
-    let obj = content;
-    for (let i = 0; i < path.length - 1; i++)
-      obj = isNaN(path[i]) ? obj[path[i]] : obj[+path[i]];
-    const last = path[path.length-1];
-    if (isNaN(last)) obj[last] = inp.value; else obj[+last] = inp.value;
+    const path=inp.dataset.path.split('.');
+    let obj=content;
+    for(let i=0;i<path.length-1;i++) obj=isNaN(path[i])?obj[path[i]]:obj[+path[i]];
+    const last=path[path.length-1];
+    const val = inp.dataset.bool==='true' ? inp.classList.contains('on') : inp.value;
+    if(isNaN(last)) obj[last]=val; else obj[+last]=val;
   });
 }
 
-function rebuildPanel(name) {
-  flushInputs();
-  const builders = { hero:buildHero, stats:buildStats, services:buildServices,
-                      why:buildWhy, projects:buildProjects, contact:buildContact, site:buildSite };
-  const panel = document.getElementById('panel-' + name);
-  const tmp = document.createElement('div');
-  tmp.innerHTML = builders[name]();
-  panel.replaceWith(tmp.querySelector('.panel'));
-  showPanel(name);
-}
-
-// ── SAVE ───────────────────────────────────────────────────
+// ── SAVE ─────────────────────────────────────────────────────
 async function saveContent() {
   flushInputs();
-  const saveBtn = document.getElementById('save-btn');
-  saveBtn.className = 'save-btn saving';
-  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+  const btn=document.getElementById('save-btn');
+  btn.className='save-btn saving'; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving…';
   try {
-    const metaResp = await fetch(API, { headers: { Authorization: 'token ' + TOKEN } });
-    const meta = await metaResp.json();
-    fileSHA = meta.sha;
-    const resp = await fetch(API, {
-      method: 'PUT',
-      headers: { Authorization: 'token ' + TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'CMS update via admin panel',
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-        sha: fileSHA
-      })
+    const m=await(await fetch(API,{headers:{Authorization:'token '+TOKEN}})).json();
+    fileSHA=m.sha;
+    const resp=await fetch(API,{method:'PUT',
+      headers:{Authorization:'token '+TOKEN,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'CMS update',
+        content:btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2)))),sha:fileSHA})
     });
-    if (!resp.ok) throw new Error(await resp.text());
-    const data = await resp.json();
-    fileSHA = data.content.sha;
-    saveBtn.className = 'save-btn saved';
-    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-    toast('Changes saved to GitHub.');
-    setTimeout(() => {
-      saveBtn.className = 'save-btn';
-      saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save Changes';
-    }, 2500);
+    if(!resp.ok) throw new Error(await resp.text());
+    fileSHA=(await resp.json()).content.sha;
+    btn.className='save-btn saved'; btn.innerHTML='<i class="fas fa-check"></i> Saved!';
+    toast('Saved to GitHub. Site updates in ~30 seconds.');
+    setTimeout(()=>{btn.className='save-btn';btn.innerHTML='<i class="fas fa-floppy-disk"></i> Save Changes';},2500);
   } catch(e) {
-    saveBtn.className = 'save-btn';
-    saveBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save Changes';
-    toast('Save failed: ' + e.message, false);
+    btn.className='save-btn'; btn.innerHTML='<i class="fas fa-floppy-disk"></i> Save Changes';
+    toast('Save failed: '+e.message,false);
   }
 }
-
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveContent(); }
-});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveContent();}});
 </script>
 </body>
 </html>
