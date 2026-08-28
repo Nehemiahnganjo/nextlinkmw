@@ -9,10 +9,10 @@
     "cta_href": "#contact"
   },
   "hero": {
-    "badge": "Rumphi, Malawi · Local & Remote",
-    "heading_line1": "Your IT Problems,",
-    "heading_line2": "Permanently Solved",
-    "subtext": "Custom software. Network infrastructure. Financial systems. IoT. If your business has an IT problem that spreadsheets and off-the-shelf software can't fix — that's exactly what NextLink MW is for.",
+    "badge": "IT Solutions · Malawi 🇲🇼",
+    "heading_line1": "We Build the Software",
+    "heading_line2": "Your Business Actually Needs",
+    "subtext": "Custom POS, banking, hotel, school, and farm systems — built from scratch for how your business works. Based in Rumphi, serving clients across Malawi and remotely.",
     "btn_primary_text": "See What We Build",
     "btn_primary_href": "#services",
     "btn_ghost_text": "Talk to Us",
@@ -21,19 +21,19 @@
   "stats": [
     {
       "number": "5+",
-      "label": "Years in the Field"
+      "label": "Years in IT"
     },
     {
       "number": "10+",
       "label": "Systems Deployed"
     },
     {
-      "number": "7+",
+      "number": "7",
       "label": "Industries Served"
     },
     {
       "number": "24/7",
-      "label": "Support Available"
+      "label": "Support"
     }
   ],
   "services": {
@@ -128,85 +128,87 @@
     ]
   },
   "projects": {
-    "label": "Proof of Work",
-    "title": "Things We've Actually Shipped",
-    "subtext": "A selection of projects built, deployed, and being used by real people right now.",
+    "label": "Client Work",
+    "title": "Systems Built & Deployed",
+    "subtext": "Real businesses. Real workflows. Running right now.",
     "items": [
       {
-        "emoji": "🌐",
-        "title": "Unique SACCO Platform",
-        "body": "Live SACCO website with member portal and floating CMS panel. Non-technical staff manage content without touching code. Real accounts. Real transactions.",
+        "emoji": "🏦",
+        "title": "Unique SACCO",
+        "body": "Full SACCO platform — member portal, loan management, savings accounts, and CMS. Staff manage content without touching code. Live at uniquesacco.com.",
         "tags": [
           "PHP",
           "JavaScript",
-          "CMS",
+          "SACCO",
           "Live"
         ],
-        "visible": true,
-        "link": ""
+        "link": "https://uniquesacco.com",
+        "visible": true
       },
       {
         "emoji": "🏦",
         "title": "Karonga Village Bank",
-        "body": "Full village banking system for Bank Mmuzi — member registration, savings accounts, loan tracking, and repayment schedules. Runs on a single machine, no internet required.",
+        "body": "Village banking system for Bank Mmuzi — member registration, savings, loan tracking, repayment schedules. Runs offline on a single machine.",
         "tags": [
           "Python",
           "SQLite",
-          "Offline-first"
+          "Offline",
+          "Fintech"
         ],
-        "visible": true,
-        "link": ""
+        "link": "",
+        "visible": true
+      },
+      {
+        "emoji": "🌾",
+        "title": "Super Farm",
+        "body": "Farm management system — livestock records, crop cycles, input tracking, harvest logs, and sales reports. Built for field use.",
+        "tags": [
+          "PHP",
+          "Laravel",
+          "MySQL",
+          "Agriculture"
+        ],
+        "link": "",
+        "visible": true
+      },
+      {
+        "emoji": "🏨",
+        "title": "Lodge PMS",
+        "body": "Property management system for a local lodge — room bookings, check-in/out, invoicing, housekeeping status board, and daily revenue reports.",
+        "tags": [
+          "Rust",
+          "Tauri",
+          "SQLite",
+          "Hospitality"
+        ],
+        "link": "",
+        "visible": true
+      },
+      {
+        "emoji": "🛒",
+        "title": "Retail POS",
+        "body": "Point of sale system with stock management, barcode scanning, receipts, and end-of-day reports. Works fully offline. Deployed to a multi-branch retailer.",
+        "tags": [
+          "Rust",
+          "Tauri",
+          "Offline",
+          "Retail"
+        ],
+        "link": "",
+        "visible": true
       },
       {
         "emoji": "🏠",
         "title": "Next Smart Home",
-        "body": "Home automation stack built on ESP32 — MQTT over TLS, real-time WebSocket dashboard, Android control app. Relay switching, PWM, and sensor monitoring from your phone.",
+        "body": "IoT home automation — ESP32 hardware, MQTT over TLS, real-time WebSocket dashboard, Android app. Relay switching, PWM dimming, sensor monitoring.",
         "tags": [
           "ESP32",
           "Laravel",
           "Android",
-          "MQTT"
+          "IoT"
         ],
-        "visible": true,
-        "link": ""
-      },
-      {
-        "emoji": "🐧",
-        "title": "Nganjo OS",
-        "body": "Custom Arch Linux distribution — GNOME on Wayland, pre-configured for a developer workstation. Ships as a bootable ISO. Used daily as a primary OS.",
-        "tags": [
-          "Bash",
-          "Archiso",
-          "Linux"
-        ],
-        "visible": true,
-        "link": ""
-      },
-      {
-        "emoji": "🤖",
-        "title": "Atarah Assistant",
-        "body": "AI assistant built from scratch — voice input, persistent memory, reasoning engine, and desktop system integration. Not a wrapper around someone else's API.",
-        "tags": [
-          "Python",
-          "AI",
-          "Voice",
-          "Local"
-        ],
-        "visible": true,
-        "link": ""
-      },
-      {
-        "emoji": "⚽",
-        "title": "Bet Neural",
-        "body": "Football match outcome predictor — Poisson regression + ensemble ML trained on six years of match data across seven European leagues. Consistently outperforms pundit consensus.",
-        "tags": [
-          "Python",
-          "ML",
-          "Poisson",
-          "7 Leagues"
-        ],
-        "visible": true,
-        "link": ""
+        "link": "https://github.com/Nehemiahnganjo/Next_Smart_Home",
+        "visible": true
       }
     ]
   },
